@@ -1,0 +1,518 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5F90F9441C5FF45700B119DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9431C5FF45700B119DB /* AppDelegate.swift */; };
+		5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F90F9451C5FF45700B119DB /* GameScene.sks */; };
+		5F90F9481C5FF45700B119DB /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9471C5FF45700B119DB /* GameScene.swift */; };
+		5F90F94A1C5FF45700B119DB /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9491C5FF45700B119DB /* GameViewController.swift */; };
+		5F90F94D1C5FF45700B119DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F90F94B1C5FF45700B119DB /* Main.storyboard */; };
+		5F90F94F1C5FF45700B119DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F90F94E1C5FF45700B119DB /* Assets.xcassets */; };
+		5F90F9521C5FF45700B119DB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F90F9501C5FF45700B119DB /* LaunchScreen.storyboard */; };
+		5F90F95D1C5FF45700B119DB /* SpriteKit_courseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F95C1C5FF45700B119DB /* SpriteKit_courseTests.swift */; };
+		5F90F9681C5FF45700B119DB /* SpriteKit_courseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9671C5FF45700B119DB /* SpriteKit_courseUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5F90F9591C5FF45700B119DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F90F9381C5FF45700B119DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F90F93F1C5FF45700B119DB;
+			remoteInfo = "SpriteKit course";
+		};
+		5F90F9641C5FF45700B119DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5F90F9381C5FF45700B119DB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5F90F93F1C5FF45700B119DB;
+			remoteInfo = "SpriteKit course";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5F90F9401C5FF45700B119DB /* SpriteKit course.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SpriteKit course.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F90F9431C5FF45700B119DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5F90F9451C5FF45700B119DB /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		5F90F9471C5FF45700B119DB /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		5F90F9491C5FF45700B119DB /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		5F90F94C1C5FF45700B119DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5F90F94E1C5FF45700B119DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5F90F9511C5FF45700B119DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		5F90F9531C5FF45700B119DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F90F9581C5FF45700B119DB /* SpriteKit courseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SpriteKit courseTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F90F95C1C5FF45700B119DB /* SpriteKit_courseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit_courseTests.swift; sourceTree = "<group>"; };
+		5F90F95E1C5FF45700B119DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F90F9631C5FF45700B119DB /* SpriteKit courseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SpriteKit courseUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F90F9671C5FF45700B119DB /* SpriteKit_courseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit_courseUITests.swift; sourceTree = "<group>"; };
+		5F90F9691C5FF45700B119DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5F90F93D1C5FF45700B119DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F9551C5FF45700B119DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F9601C5FF45700B119DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5F90F9371C5FF45700B119DB = {
+			isa = PBXGroup;
+			children = (
+				5F90F9421C5FF45700B119DB /* SpriteKit course */,
+				5F90F95B1C5FF45700B119DB /* SpriteKit courseTests */,
+				5F90F9661C5FF45700B119DB /* SpriteKit courseUITests */,
+				5F90F9411C5FF45700B119DB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5F90F9411C5FF45700B119DB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5F90F9401C5FF45700B119DB /* SpriteKit course.app */,
+				5F90F9581C5FF45700B119DB /* SpriteKit courseTests.xctest */,
+				5F90F9631C5FF45700B119DB /* SpriteKit courseUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5F90F9421C5FF45700B119DB /* SpriteKit course */ = {
+			isa = PBXGroup;
+			children = (
+				5F90F9431C5FF45700B119DB /* AppDelegate.swift */,
+				5F90F9451C5FF45700B119DB /* GameScene.sks */,
+				5F90F9471C5FF45700B119DB /* GameScene.swift */,
+				5F90F9491C5FF45700B119DB /* GameViewController.swift */,
+				5F90F94B1C5FF45700B119DB /* Main.storyboard */,
+				5F90F94E1C5FF45700B119DB /* Assets.xcassets */,
+				5F90F9501C5FF45700B119DB /* LaunchScreen.storyboard */,
+				5F90F9531C5FF45700B119DB /* Info.plist */,
+			);
+			path = "SpriteKit course";
+			sourceTree = "<group>";
+		};
+		5F90F95B1C5FF45700B119DB /* SpriteKit courseTests */ = {
+			isa = PBXGroup;
+			children = (
+				5F90F95C1C5FF45700B119DB /* SpriteKit_courseTests.swift */,
+				5F90F95E1C5FF45700B119DB /* Info.plist */,
+			);
+			path = "SpriteKit courseTests";
+			sourceTree = "<group>";
+		};
+		5F90F9661C5FF45700B119DB /* SpriteKit courseUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5F90F9671C5FF45700B119DB /* SpriteKit_courseUITests.swift */,
+				5F90F9691C5FF45700B119DB /* Info.plist */,
+			);
+			path = "SpriteKit courseUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5F90F93F1C5FF45700B119DB /* SpriteKit course */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F90F96C1C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit course" */;
+			buildPhases = (
+				5F90F93C1C5FF45700B119DB /* Sources */,
+				5F90F93D1C5FF45700B119DB /* Frameworks */,
+				5F90F93E1C5FF45700B119DB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SpriteKit course";
+			productName = "SpriteKit course";
+			productReference = 5F90F9401C5FF45700B119DB /* SpriteKit course.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5F90F9571C5FF45700B119DB /* SpriteKit courseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F90F96F1C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit courseTests" */;
+			buildPhases = (
+				5F90F9541C5FF45700B119DB /* Sources */,
+				5F90F9551C5FF45700B119DB /* Frameworks */,
+				5F90F9561C5FF45700B119DB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5F90F95A1C5FF45700B119DB /* PBXTargetDependency */,
+			);
+			name = "SpriteKit courseTests";
+			productName = "SpriteKit courseTests";
+			productReference = 5F90F9581C5FF45700B119DB /* SpriteKit courseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5F90F9621C5FF45700B119DB /* SpriteKit courseUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F90F9721C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit courseUITests" */;
+			buildPhases = (
+				5F90F95F1C5FF45700B119DB /* Sources */,
+				5F90F9601C5FF45700B119DB /* Frameworks */,
+				5F90F9611C5FF45700B119DB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5F90F9651C5FF45700B119DB /* PBXTargetDependency */,
+			);
+			name = "SpriteKit courseUITests";
+			productName = "SpriteKit courseUITests";
+			productReference = 5F90F9631C5FF45700B119DB /* SpriteKit courseUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5F90F9381C5FF45700B119DB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "Karol Pilch";
+				TargetAttributes = {
+					5F90F93F1C5FF45700B119DB = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 3E632972VT;
+					};
+					5F90F9571C5FF45700B119DB = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 3E632972VT;
+						TestTargetID = 5F90F93F1C5FF45700B119DB;
+					};
+					5F90F9621C5FF45700B119DB = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 3E632972VT;
+						TestTargetID = 5F90F93F1C5FF45700B119DB;
+					};
+				};
+			};
+			buildConfigurationList = 5F90F93B1C5FF45700B119DB /* Build configuration list for PBXProject "SpriteKit course" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5F90F9371C5FF45700B119DB;
+			productRefGroup = 5F90F9411C5FF45700B119DB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5F90F93F1C5FF45700B119DB /* SpriteKit course */,
+				5F90F9571C5FF45700B119DB /* SpriteKit courseTests */,
+				5F90F9621C5FF45700B119DB /* SpriteKit courseUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5F90F93E1C5FF45700B119DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */,
+				5F90F9521C5FF45700B119DB /* LaunchScreen.storyboard in Resources */,
+				5F90F94F1C5FF45700B119DB /* Assets.xcassets in Resources */,
+				5F90F94D1C5FF45700B119DB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F9561C5FF45700B119DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F9611C5FF45700B119DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5F90F93C1C5FF45700B119DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F90F9481C5FF45700B119DB /* GameScene.swift in Sources */,
+				5F90F94A1C5FF45700B119DB /* GameViewController.swift in Sources */,
+				5F90F9441C5FF45700B119DB /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F9541C5FF45700B119DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F90F95D1C5FF45700B119DB /* SpriteKit_courseTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F90F95F1C5FF45700B119DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F90F9681C5FF45700B119DB /* SpriteKit_courseUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5F90F95A1C5FF45700B119DB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F90F93F1C5FF45700B119DB /* SpriteKit course */;
+			targetProxy = 5F90F9591C5FF45700B119DB /* PBXContainerItemProxy */;
+		};
+		5F90F9651C5FF45700B119DB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5F90F93F1C5FF45700B119DB /* SpriteKit course */;
+			targetProxy = 5F90F9641C5FF45700B119DB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		5F90F94B1C5FF45700B119DB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5F90F94C1C5FF45700B119DB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5F90F9501C5FF45700B119DB /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5F90F9511C5FF45700B119DB /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		5F90F96A1C5FF45700B119DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5F90F96B1C5FF45700B119DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5F90F96D1C5FF45700B119DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "SpriteKit course/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-course";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		5F90F96E1C5FF45700B119DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "SpriteKit course/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-course";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		5F90F9701C5FF45700B119DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = "SpriteKit courseTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-courseTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpriteKit course.app/SpriteKit course";
+			};
+			name = Debug;
+		};
+		5F90F9711C5FF45700B119DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = "SpriteKit courseTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-courseTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpriteKit course.app/SpriteKit course";
+			};
+			name = Release;
+		};
+		5F90F9731C5FF45700B119DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = "SpriteKit courseUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-courseUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "SpriteKit course";
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		5F90F9741C5FF45700B119DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "SpriteKit courseUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-courseUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = "SpriteKit course";
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5F90F93B1C5FF45700B119DB /* Build configuration list for PBXProject "SpriteKit course" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F90F96A1C5FF45700B119DB /* Debug */,
+				5F90F96B1C5FF45700B119DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5F90F96C1C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit course" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F90F96D1C5FF45700B119DB /* Debug */,
+				5F90F96E1C5FF45700B119DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		5F90F96F1C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit courseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F90F9701C5FF45700B119DB /* Debug */,
+				5F90F9711C5FF45700B119DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		5F90F9721C5FF45700B119DB /* Build configuration list for PBXNativeTarget "SpriteKit courseUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F90F9731C5FF45700B119DB /* Debug */,
+				5F90F9741C5FF45700B119DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5F90F9381C5FF45700B119DB /* Project object */;
+}
