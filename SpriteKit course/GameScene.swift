@@ -54,15 +54,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		static let All: UInt32						= UINT32_MAX
 	}
 	
-//	let obstacleCategory: UInt32 =		0b1 << 0	// 1
-//	let ballCategory: UInt32 =		0b1 << 1	// 2
-//	let pegMask: UInt32 =			0b1 << 2	// 4
-//	let squareMask: UInt32 =	0b1 << 3	// 8
-//	let sparkyMask: UInt32 =  0b1 << 4	// 16
-//	
-//	let orangeNode: UInt32 =	0b1 << 5	// 32
-//	let blueNode: UInt32 =		0b1 << 6	// 64
-	
 	let orangeColor = UIColor(red: 1, green: 164.0/256.0, blue: 0, alpha: 1)
 	let blueColor = UIColor(red: 37/256.0, green: 174/256.0, blue: 188/256.0, alpha: 1)
 	
