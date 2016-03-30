@@ -10,7 +10,11 @@
 		5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F15152F1C88BCAD0005C8EB /* Ball.sks */; };
 		5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F572E991C777ABD00D40E5F /* MainMenu.sks */; };
 		5F572E9C1C777B1B00D40E5F /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F572E9B1C777B1B00D40E5F /* MainMenu.swift */; };
+		5F6868731CA0719300940ACD /* Sea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6868721CA0719300940ACD /* Sea.swift */; };
 		5F6E170E1C9201D800B9C883 /* SparkParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F6E170C1C9201D800B9C883 /* SparkParticle.sks */; };
+		5F818A251C9EE400003CF1EC /* peg.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5F818A221C9EE400003CF1EC /* peg.wav */; };
+		5F818A261C9EE400003CF1EC /* plum.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5F818A231C9EE400003CF1EC /* plum.wav */; };
+		5F818A271C9EE400003CF1EC /* shot.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5F818A241C9EE400003CF1EC /* shot.wav */; };
 		5F90F9441C5FF45700B119DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9431C5FF45700B119DB /* AppDelegate.swift */; };
 		5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F90F9451C5FF45700B119DB /* GameScene.sks */; };
 		5F90F9481C5FF45700B119DB /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F90F9471C5FF45700B119DB /* GameScene.swift */; };
@@ -43,7 +47,11 @@
 		5F15152F1C88BCAD0005C8EB /* Ball.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Ball.sks; sourceTree = "<group>"; };
 		5F572E991C777ABD00D40E5F /* MainMenu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenu.sks; sourceTree = "<group>"; };
 		5F572E9B1C777B1B00D40E5F /* MainMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		5F6868721CA0719300940ACD /* Sea.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sea.swift; sourceTree = "<group>"; };
 		5F6E170C1C9201D800B9C883 /* SparkParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = SparkParticle.sks; sourceTree = "<group>"; };
+		5F818A221C9EE400003CF1EC /* peg.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = peg.wav; sourceTree = "<group>"; };
+		5F818A231C9EE400003CF1EC /* plum.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = plum.wav; sourceTree = "<group>"; };
+		5F818A241C9EE400003CF1EC /* shot.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shot.wav; sourceTree = "<group>"; };
 		5F90F9401C5FF45700B119DB /* SpriteKit course.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SpriteKit course.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F90F9431C5FF45700B119DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5F90F9451C5FF45700B119DB /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -86,6 +94,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5F818A281C9EE417003CF1EC /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				5F818A221C9EE400003CF1EC /* peg.wav */,
+				5F818A231C9EE400003CF1EC /* plum.wav */,
+				5F818A241C9EE400003CF1EC /* shot.wav */,
+			);
+			name = Sounds;
+			sourceTree = "<group>";
+		};
 		5F90F9371C5FF45700B119DB = {
 			isa = PBXGroup;
 			children = (
@@ -111,6 +129,7 @@
 			children = (
 				5F90F9431C5FF45700B119DB /* AppDelegate.swift */,
 				5F15152F1C88BCAD0005C8EB /* Ball.sks */,
+				5F6868721CA0719300940ACD /* Sea.swift */,
 				5F90F9451C5FF45700B119DB /* GameScene.sks */,
 				5F90F9471C5FF45700B119DB /* GameScene.swift */,
 				5F6E170C1C9201D800B9C883 /* SparkParticle.sks */,
@@ -121,6 +140,7 @@
 				5F90F94E1C5FF45700B119DB /* Assets.xcassets */,
 				5F90F9501C5FF45700B119DB /* LaunchScreen.storyboard */,
 				5F90F9531C5FF45700B119DB /* Info.plist */,
+				5F818A281C9EE417003CF1EC /* Sounds */,
 			);
 			path = "SpriteKit course";
 			sourceTree = "<group>";
@@ -250,13 +270,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F818A271C9EE400003CF1EC /* shot.wav in Resources */,
 				5F6E170E1C9201D800B9C883 /* SparkParticle.sks in Resources */,
 				5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */,
 				5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */,
 				5F90F9521C5FF45700B119DB /* LaunchScreen.storyboard in Resources */,
 				5F90F94F1C5FF45700B119DB /* Assets.xcassets in Resources */,
 				5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */,
+				5F818A261C9EE400003CF1EC /* plum.wav in Resources */,
 				5F90F94D1C5FF45700B119DB /* Main.storyboard in Resources */,
+				5F818A251C9EE400003CF1EC /* peg.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F6868731CA0719300940ACD /* Sea.swift in Sources */,
 				5F90F9481C5FF45700B119DB /* GameScene.swift in Sources */,
 				5F90F94A1C5FF45700B119DB /* GameViewController.swift in Sources */,
 				5F90F9441C5FF45700B119DB /* AppDelegate.swift in Sources */,

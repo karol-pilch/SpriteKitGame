@@ -49,6 +49,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		static let Orange: UInt32					= 0b1 << 3	// 8
 		static let Blue: UInt32						= 0b1 << 4	// 16
 		static let Ball: UInt32						= 0b1 << 5	// 32
+		static let FlyThrough: UInt32			= 0b1 << 6	// 64
+		static let Bucket: UInt32					= 0b1 << 7	// 128
+		static let Floor: UInt32					= 0b1 << 8	// 256
 		
 		static let None: UInt32						= 0
 		static let All: UInt32						= UINT32_MAX
@@ -72,10 +75,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	   fied that the contact occurred.
 */
 	
-	var lonelyLabel: SKLabelNode!
-	var yellowBlock: SKSpriteNode!
 	var cannon: SKSpriteNode!
 	var cannonPosition = CGPointZero
+	var score: Int = 0
 	
 	var touchLocation: CGPoint = CGPointZero
 	
@@ -91,56 +93,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			dy: (vectorLength / maxLength) * (touchPosition.y - ballPosition.y))
 	}
 	
-	func startYellowBlockActions() {
-		// Set the anchor point on the bottom
-		yellowBlock.anchorPoint = CGPoint(x: 0.5, y: 0)
-		
-		// Scale a bit to make it look like it's walking
-		let scaleDuration = 0.6	// Speed of wobbling
-		let scaleUp = (
-			x: SKAction.scaleXTo(0.7, duration: scaleDuration),
-			y: SKAction.scaleYTo(1.3, duration: scaleDuration)
-		)
-		let scaleDown = (
-			x: SKAction.scaleXTo(1, duration: scaleDuration),
-			y: SKAction.scaleYTo(1, duration: scaleDuration)
-		)
-		for scale in [scaleUp, scaleDown] {
-			scale.x.timingMode = SKActionTimingMode.EaseInEaseOut
-			scale.y.timingMode = SKActionTimingMode.EaseInEaseOut
-		}
-		
-		yellowBlock.runAction(SKAction.repeatActionForever(SKAction.sequence([scaleUp.x, scaleDown.x])))
-		yellowBlock.runAction(SKAction.repeatActionForever(SKAction.sequence([scaleUp.y, scaleDown.y])))
-		
-		// Figure out bottom left and right corners of the scene
-		let halfWidth = yellowBlock.size.width / 2.0
-		var bottomLeft = CGPoint(x: halfWidth, y: 0)
-		var bottomRight = CGPoint(x: self.size.width - halfWidth , y: 0)
-		
-		if let leftWall = self.childNodeWithName("leftWall") as? SKSpriteNode {
-			bottomLeft.x += leftWall.size.width * (1 - leftWall.anchorPoint.x)
-		}
-		if let rightWall = self.childNodeWithName("rightWall") as? SKSpriteNode {
-			bottomRight.x -= rightWall.size.width * rightWall.anchorPoint.x
-		}
-		if let floor = self.childNodeWithName("floor") as? SKSpriteNode {
-			let deltaY = floor.size.height * (1 - floor.anchorPoint.y)
-			bottomLeft.y += deltaY
-			bottomRight.y += deltaY
-		}
-		
-		// Move to the bottom left
-		yellowBlock.position = bottomLeft
-		
-		// Make it move left and right
-		let moveDuration = 4.0
-		let moveRight = SKAction.moveTo(bottomRight, duration: moveDuration)
-		moveRight.timingMode = SKActionTimingMode.EaseInEaseOut
-		
-		let moveLeft = SKAction.moveTo(bottomLeft, duration: moveDuration)
-		moveLeft.timingMode = SKActionTimingMode.EaseInEaseOut
-		yellowBlock.runAction(SKAction.repeatActionForever(SKAction.sequence([moveRight, moveLeft])))
+	func wobbleBucket(bucket: SKNode, delta: Double) {
+		let duration: NSTimeInterval = 0.5
+		let moveUp = SKAction.moveBy(CGVector(dx: 0, dy: delta), duration: duration * 1.2)
+		moveUp.timingMode = SKActionTimingMode.EaseInEaseOut
+		let moveDown = SKAction.moveBy(CGVector(dx: 0, dy: -delta), duration: duration)
+		moveDown.timingMode = SKActionTimingMode.EaseInEaseOut
+		let wobbleSequence = SKAction.sequence([moveUp, moveDown, SKAction.waitForDuration(duration)])
+		bucket.runAction(SKAction.repeatActionForever(wobbleSequence))
 	}
 	
 	override func didMoveToView(view: SKView) {
@@ -150,11 +110,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Connect nodes to our variables
 		cannon = self.childNodeWithName("//cannon") as! SKSpriteNode
 		if let pos = absolutePosition(cannon) { cannonPosition = pos }
-		yellowBlock = self.childNodeWithName("yellowBlock") as! SKSpriteNode
-		lonelyLabel = self.childNodeWithName("lonelyLabel") as! SKLabelNode
 		
 		// Process nodes in the scene
-		for nodeName in ["rotatingSquare", "orangePeg", "bluePeg", "leftWall", "rightWall", "floor", "yellowBlock"] {
+		for nodeName in ["rotatingSquare", "orangePeg", "bluePeg", "leftWall", "rightWall", "floor", "bucket"] {
 			enumerateChildNodesWithName(nodeName, usingBlock: { (node: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) -> Void in
 				if node.physicsBody != nil {
 					switch nodeName {
@@ -164,29 +122,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Orange
 						case "bluePeg":
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Blue
-						case "leftWall", "rightWall", "floor":
+						case "leftWall", "rightWall":
 							node.physicsBody!.categoryBitMask = NodeCategory.Obstacle
-						case "yellowBlock":
-							node.physicsBody!.categoryBitMask = NodeCategory.Obstacle
+						case "floor":
+							node.physicsBody!.categoryBitMask = NodeCategory.Floor | NodeCategory.Sparks
+						case "bucket":
+							node.physicsBody!.categoryBitMask = NodeCategory.Bucket
+							self.wobbleBucket(node, delta: 15)
 						default: break
 					}
 				}
 			})
 		}
-		
-		// Start the actions we defined in code
-		startYellowBlockActions()
 	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
 		if let firstTouch = touches.first {
 			touchLocation = firstTouch.locationInNode(self)
-			
-			let fadeOut = SKAction.sequence([
-				SKAction.fadeOutWithDuration(0.5),
-				SKAction.removeFromParent()]);	// This actually doesn't delete it - it just disappears from the parent.
-			
-			lonelyLabel.runAction(fadeOut)
 		}
 	}
 	
@@ -202,10 +154,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			let cannonPosition = absolutePosition(cannon)!
 			ball.position = cannonPosition
 			ball.physicsBody?.categoryBitMask = NodeCategory.Ball
+			ball.physicsBody?.collisionBitMask = NodeCategory.All - NodeCategory.FlyThrough
 			
 			// Shoot it out (instead of just dropping)
 			if let touchPosition = touches.first?.locationInNode(self) {
 				ball.physicsBody?.applyImpulse(ballVector(ballPosition: cannonPosition, touchPosition: touchPosition))
+				cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
 			}
 		}
 	}
@@ -220,6 +174,47 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Calculate the cannon angle and update it
 		let newAngle = atan2((touchLocation.x - cannonPosition.x), (touchLocation.y - cannonPosition.y))
 		cannon.zRotation = -newAngle + CGFloat(M_PI/2)
+	}
+	
+	var backgroundNodeColor: UIColor? = nil
+	
+	func bucketHit(ball: SKNode?) {
+		let label = self.childNodeWithName("scoreLabel") as? SKLabelNode
+		label?.text = "\(++score) ball\(score > 1 ? "s" : "") in the bucket!"
+		self.runAction(SKAction.playSoundFileNamed("plum.wav", waitForCompletion: false))
+		ball?.removeFromParent()
+		
+		
+		// Add some actions and animations
+		
+		// Background color shift
+		if let backgroundNode = self.childNodeWithName("background") as? SKSpriteNode {
+			if backgroundNodeColor == nil {
+				backgroundNodeColor = backgroundNode.color
+			}
+			let newColor = UIColor.whiteColor()
+			let oldColor = backgroundNodeColor!
+			let paintNew = SKAction.colorizeWithColor(newColor, colorBlendFactor: 1, duration: 0)
+			let paintOld = SKAction.colorizeWithColor(oldColor, colorBlendFactor: 1, duration: 0.4)
+			paintOld.timingMode = SKActionTimingMode.EaseOut
+			
+			// Cancel unfinished actions and run the new color change
+			backgroundNode.removeAllActions()
+			backgroundNode.runAction(SKAction.sequence([paintNew, paintOld]))
+		}
+		
+		// Label size
+		let ratio: CGFloat = 1.3
+		let scaleUp = SKAction.scaleBy(ratio, duration: 0.1)
+		scaleUp.timingMode = SKActionTimingMode.EaseIn
+		let scaleDown = SKAction.scaleBy(1/ratio, duration: 0.2)
+		scaleDown.timingMode = SKActionTimingMode.EaseOut
+		
+		// Cancel old actions and reset scale to 1
+		label?.removeAllActions()
+		label?.xScale = 1
+		label?.yScale = 1
+		label?.runAction(SKAction.sequence([scaleUp, scaleDown]))
 	}
 
 	
@@ -241,20 +236,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		let otherMask = other.categoryBitMask
 		
 		if otherMask & NodeCategory.Obstacle != 0 {
-			print("Hit obstacle.")
 		}
 		
 		if otherMask & NodeCategory.Destructible != 0 {
 			other.node?.removeFromParent()
+			self.runAction(SKAction.playSoundFileNamed("peg.wav", waitForCompletion: false))
 		}
 		
-		if otherMask & NodeCategory.Ball != 0 {
-			// Other ball hit: Emit sparks and remove both
-			let whiteColor = UIColor(white: 1, alpha: 1)
+		if otherMask & NodeCategory.Floor != 0 {
 			ball.node?.removeFromParent()
-			other.node?.removeFromParent()
-			
-			emitSparks(contact.contactPoint, color: whiteColor)
+		}
+		
+	
+		if otherMask & NodeCategory.Bucket != 0 {
+			bucketHit(ball.node)
 		}
 		
 		if otherMask & NodeCategory.Sparks != 0 {
