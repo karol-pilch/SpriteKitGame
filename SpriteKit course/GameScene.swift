@@ -134,6 +134,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 				}
 			})
 		}
+		
+		// Add the sea on the bottom
+		let sea = Sea(width: self.size.width, size: 80)
+		sea.colorRange = 0.8
+		sea.wavePositionRange = 0.2
+		
+		// Here: Carry on playing with color replacement and wave movement
+		sea.addWaves()
+		
+		sea.position = CGPoint(x: self.size.width / 2, y: 100)
+		self.addChild(sea)
 	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -179,8 +190,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var backgroundNodeColor: UIColor? = nil
 	
 	func bucketHit(ball: SKNode?) {
+		score = score + 1;
 		let label = self.childNodeWithName("scoreLabel") as? SKLabelNode
-		label?.text = "\(++score) ball\(score > 1 ? "s" : "") in the bucket!"
+		label?.text = "\(score) ball\(score > 1 ? "s" : "") in the bucket!"
 		self.runAction(SKAction.playSoundFileNamed("plum.wav", waitForCompletion: false))
 		ball?.removeFromParent()
 		

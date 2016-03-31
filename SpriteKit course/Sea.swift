@@ -5,7 +5,7 @@
 //  Created by Karol Pilch on 21/03/2016.
 //  Copyright © 2016 Karol Pilch. All rights reserved.
 //
-/*
+
 import SpriteKit
 import GameplayKit
 
@@ -38,7 +38,7 @@ internal class Sea: SKNode {
 		}
 	}
 	// How much the wave colors should vary
-	let colorRange: CGFloat = 0
+	var colorRange: CGFloat = 0
 	
 	
 	// ***** Node behavour
@@ -88,6 +88,9 @@ internal class Sea: SKNode {
 	
 	// ***** Internal seaworks
 	
+	var wavePositionRange: CGFloat = 0
+	
+	
 	// Returns a color that's a bit (or a lot, depending on range) different from baseColor
 	private func randomizeColor() -> UIColor {
 		// Get base values
@@ -97,11 +100,15 @@ internal class Sea: SKNode {
 		var alpha: CGFloat = 0
 		baseColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 		
+		// print("Base: R: \(red), G: \(green), B: \(blue)")
+		
 		// Multiply them by a random number
 		let randomizer = GKARC4RandomSource()
 		red *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
 		green *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
 		blue *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
+		
+		// print("Random: R: \(red), G: \(green), B: \(blue)")
 		
 		// Return a new random color
 		return UIColor(red: red, green: green, blue: blue, alpha: alpha)
@@ -131,7 +138,7 @@ internal class Sea: SKNode {
 		// Configure the node
 		let newWave = SKSpriteNode(texture: texture, color: waveColor, size: CGSize(width: texture.size().width / texture.size().height * waveSize, height: waveSize))
 		newWave.position = position
-		newWave.blendMode = SKBlendMode.Alpha
+		newWave.blendMode = SKBlendMode.Screen
 		newWave.colorBlendFactor = 1
 		
 		// Add physics body if needed
@@ -141,27 +148,39 @@ internal class Sea: SKNode {
 	}
 	
 	// Adds waves to this node
-	private func addWaves() {
-		// Go along the width and randomize positions of waves
+	func addWaves() {
+		
+		// We need a new randomizer
+		let randomizer = GKARC4RandomSource()
+		let standardSpacing = waveSize * 0.7
+		
+		var positionX = CGFloat(0.0 - (width / 2))
+		repeat {
+			positionX += standardSpacing * (1 - wavePositionRange * CGFloat(randomizer.nextUniform()))
+			let positionY = standardSpacing * wavePositionRange * CGFloat((randomizer.nextUniform() - 0.5) * 2)
+			self.addChild(newWave(CGPoint(x: positionX, y: positionY)))
+		} while (positionX < (width / 2))
 	}
 	
 	init(width: CGFloat, size: CGFloat) {
 		self.width = width
 		self.waveSize = size
 		super.init()
-		
 	}
 	
 	// ***** NSCoding conformance
 	
 	override func encodeWithCoder(aCoder: NSCoder) {
 		baseColor.encodeWithCoder(aCoder)
+		aCoder.encodeFloat(Float(waveSize), forKey: "waveSize")
 		aCoder.encodeFloat(Float(width), forKey: "width")
 	}
 
 	required init?(coder aDecoder: NSCoder) {
 		// This probably happens only when we push it out of memory.
 		width = CGFloat(aDecoder.decodeFloatForKey("width"))
+		waveSize = CGFloat(aDecoder.decodeFloatForKey("waveSize"))
+		
 		if let decodedColor = UIColor.init(coder: aDecoder) {
 			baseColor = decodedColor
 		}
@@ -172,5 +191,3 @@ internal class Sea: SKNode {
 		super.init(coder: aDecoder)
 	}
 }
-
-*/*/
