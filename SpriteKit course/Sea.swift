@@ -58,12 +58,15 @@ internal class Sea: SKNode {
 	// Base color for waves
 	var baseColor: UIColor = UIColor.init(red: 0, green: 0.5, blue: 1, alpha: 1) {
 		didSet {
-			// Set new color for waves...
-
+			addWaves()
 		}
 	}
 	// How much the wave colors should vary
-	var colorRange: CGFloat = 0
+	var colorRange: Double = 0 {
+		didSet {
+			addWaves()
+		}
+	}
 	
 	
 	// ***** Node behavour
@@ -98,22 +101,41 @@ internal class Sea: SKNode {
 					if let wave = node as? SKSpriteNode {
 						// Add a body if the wave doesn't have one
 						if wave.physicsBody == nil {
-							
+							self.addPhysicsBodyToWave(wave)
 						}
-						
-						wave.physicsBody?.categoryBitMask = self.physicsConfiguration!.categoryBitMask
-						wave.physicsBody?.collisionBitMask = self.physicsConfiguration!.categoryBitMask
-						wave.physicsBody?.contactTestBitMask = self.physicsConfiguration!.contactTestBitMask
+						else {
+							wave.physicsBody?.categoryBitMask = self.physicsConfiguration!.categoryBitMask
+							wave.physicsBody?.collisionBitMask = self.physicsConfiguration!.categoryBitMask
+							wave.physicsBody?.contactTestBitMask = self.physicsConfiguration!.contactTestBitMask
+						}
 					}
 				}
 			}
 		}
 	}
 	
+	// Must be set to true before showing.
+	var ready: Bool = false {
+		didSet {
+			if (ready == true) {
+				addWaves()
+			}
+		}
+	}
 	
 	// ***** Internal seaworks
 	
-	var wavePositionRange: Double = 0
+	var wavePositionRange: Double = 0 {
+		didSet {
+			addWaves()
+		}
+	}
+	
+	var waveDensity: Double = 2.5 {
+		didSet {
+			addWaves()
+		}
+	}
 	
 	
 	// Returns a color that's a bit (or a lot, depending on range) different from baseColor
@@ -127,10 +149,9 @@ internal class Sea: SKNode {
 		
 		
 		// Multiply them by a random number
-		let randomizer = GKARC4RandomSource()
-		red *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
-		green *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
-		blue *= 1 - (colorRange * CGFloat(randomizer.nextUniform()))
+		red = Randomizer.randomize(red, factor: colorRange)
+		green = Randomizer.randomize(green, factor: colorRange)
+		blue = Randomizer.randomize(blue, factor: colorRange)
 		
 		// Return a new random color
 		return UIColor(red: red, green: green, blue: blue, alpha: alpha)
@@ -139,7 +160,7 @@ internal class Sea: SKNode {
 	// Adds physics body to a wave if one has been configured for the Sea
 	private func addPhysicsBodyToWave(wave: SKSpriteNode) {
 		if let config = physicsConfiguration {
-			let texture = SKTexture(imageNamed: "wave")
+			let texture = SKTexture(imageNamed: "wave-white")
 			let newBody = SKPhysicsBody(texture: texture, size: CGSize(width: texture.size().width / texture.size().height * waveSize, height: waveSize))
 			newBody.categoryBitMask = config.categoryBitMask
 			newBody.collisionBitMask = config.collisionBitMask
@@ -160,12 +181,9 @@ internal class Sea: SKNode {
 		// Configure the node
 		let newWave = SKSpriteNode(texture: texture, color: waveColor, size: CGSize(width: texture.size().width / texture.size().height * waveSize, height: waveSize))
 		newWave.position = position
-		newWave.blendMode = SKBlendMode.Add
-		newWave.colorBlendFactor = 0.8
-        
-        // TODO: Change how this works to get right colours. Maybe colour the sprite?
-		
-		// TODO: Change how this works to get right colours. Maybe colour the sprite?
+		newWave.blendMode = SKBlendMode.Alpha
+		newWave.colorBlendFactor = 1
+		newWave.name = "wave"
 		
 		// Add physics body if needed
 		addPhysicsBodyToWave(newWave)
@@ -178,25 +196,49 @@ internal class Sea: SKNode {
 	// Adds waves to this node
 	func addWaves() {
 		
-		let standardSpacing = waveSize * 0.7
+		if !ready { return }
 		
-		var positionX = CGFloat(0.0 - (width / 2))
+		print("adding waves")
+		
+		// Remove all old waves
+		enumerateChildNodesWithName("wave") { (wave: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) in
+			wave.removeFromParent()
+		}
+		
+		let distance = waveSize / CGFloat(waveDensity)
+		
+		var x = -width / 2 - distance
 		repeat {
-			positionX += Randomizer.randomize(standardSpacing, factor: wavePositionRange)
-			let positionY = standardSpacing - Randomizer.randomize(standardSpacing, factor: wavePositionRange)
-			let wave = newWave(CGPoint(x: positionX, y: positionY))
+			x += Randomizer.randomize(distance, factor: wavePositionRange)
+			let y = -waveSize / 2 + Randomizer.randomize(distance, factor: wavePositionRange)
+			let wave = newWave(CGPoint(x: x, y: y))
+			
+			wave.zPosition = Randomizer.between(0.0, 10.0)
 			
 			// Add motion
-			let radius = Randomizer.randomize(standardSpacing, factor: wavePositionRange) / 2
+			let radius = Randomizer.randomize(distance, factor: wavePositionRange) / 2
 			wave.position = CGPoint(x: wave.position.x - radius, y: wave.position.y - radius)
-			let period = Double(Randomizer.randomize(2, factor: 0.5))
+			let period = NSTimeInterval(Randomizer.randomize(2, factor: 0.5))
 			
-			// Make a circle and move the wave around it
-			// xcdoc://?url=developer.apple.com/library/ios/documentation/SpriteKit/Reference/SKAction_Ref/index.html#//apple_ref/occ/clm/SKAction/followPath:asOffset:orientToPath:duration:
+			// Circular motion
+			let circle: CGMutablePathRef = CGPathCreateMutable()
+			CGPathAddArc(circle, nil, x, y, radius, 0, CGFloat(2 * M_PI), true)
+			let circleAction = SKAction.followPath(circle, asOffset: false, orientToPath: false, duration: period)
+			wave.runAction(SKAction.repeatActionForever(circleAction))
 			
+			// Slight rotation
+			let maxRotationAngle = Randomizer.randomize(CGFloat(M_PI / 2 * wavePositionRange), factor: wavePositionRange)
+			let rotateRight = SKAction.rotateByAngle(2 * maxRotationAngle, duration: period / 2)
+			rotateRight.timingMode = SKActionTimingMode.EaseInEaseOut
+			let rotateLeft = SKAction.rotateByAngle(-2 * maxRotationAngle, duration: period / 2)
+			rotateLeft.timingMode = SKActionTimingMode.EaseInEaseOut
+			let rotateAction = SKAction.sequence([rotateRight, rotateLeft])
+			wave.zRotation = -maxRotationAngle
+			wave.runAction(SKAction.repeatActionForever(rotateAction))
 			
 			self.addChild(wave)
-		} while (positionX < (width / 2))
+			
+		} while (x < (width / 2))
 	}
 	
 	init(width: CGFloat, size: CGFloat) {
@@ -208,15 +250,25 @@ internal class Sea: SKNode {
 	// ***** NSCoding conformance
 	
 	override func encodeWithCoder(aCoder: NSCoder) {
+		// TODO: Actually encode all variables.
 		baseColor.encodeWithCoder(aCoder)
 		aCoder.encodeFloat(Float(waveSize), forKey: "waveSize")
 		aCoder.encodeFloat(Float(width), forKey: "width")
+		aCoder.encodeDouble(colorRange, forKey: "colorRange")
+		aCoder.encodeDouble(wavePositionRange, forKey: "wavePositionRange")
+		aCoder.encodeDouble(waveDensity, forKey: "waveDensity")
+		aCoder.encodeBool(ready, forKey: "ready")
 	}
-
+	
 	required init?(coder aDecoder: NSCoder) {
 		// This probably happens only when we push it out of memory.
+		
 		width = CGFloat(aDecoder.decodeFloatForKey("width"))
 		waveSize = CGFloat(aDecoder.decodeFloatForKey("waveSize"))
+		colorRange = aDecoder.decodeDoubleForKey("colorRange")
+		wavePositionRange = aDecoder.decodeDoubleForKey("wavePositionRange")
+		waveDensity = aDecoder.decodeDoubleForKey("waveDensity")
+		ready = aDecoder.decodeBoolForKey("ready")
 		
 		if let decodedColor = UIColor.init(coder: aDecoder) {
 			baseColor = decodedColor

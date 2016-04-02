@@ -137,13 +137,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		// Add the sea on the bottom
 		let sea = Sea(width: self.size.width, size: 80)
-		sea.colorRange = 0.1
-		sea.wavePositionRange = 0.2
-		
-		// Here: Carry on playing with color replacement and wave movement
-		sea.addWaves()
-		
+		sea.baseColor = UIColor(red: 38 / 256, green: 118 / 256, blue: 254 / 256, alpha: 1)
+		sea.colorRange = 0.4
+		sea.wavePositionRange = 0.3
+		sea.waveDensity = 2.5
 		sea.position = CGPoint(x: self.size.width / 2, y: 100)
+		
+		let seaBody = SKPhysicsBody(circleOfRadius: 1)
+		seaBody.affectedByGravity = false
+		seaBody.allowsRotation = false
+		seaBody.dynamic = false
+		
+		seaBody.categoryBitMask = NodeCategory.Floor
+		seaBody.contactTestBitMask = NodeCategory.None
+		
+		// TODO it breaks here :(
+		// sea.physicsBody = seaBody
+		sea.ready = true
 		self.addChild(sea)
 	}
 	
@@ -233,6 +243,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	func didBeginContact(contact: SKPhysicsContact) {
 		// Since all of our objects except for walls have their contact category as 0, they won't notify us about a collision.
 		// Only the ball will, so we're sure that one of the bodies is the ball.
+		
+		print("contact")
 		
 		let ball: SKPhysicsBody	// We don't need it for now
 		let other: SKPhysicsBody
