@@ -137,7 +137,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		// Add the sea on the bottom
 		let sea = Sea(width: self.size.width, size: 80)
-		sea.colorRange = 0.8
+		sea.colorRange = 0.1
 		sea.wavePositionRange = 0.2
 		
 		// Here: Carry on playing with color replacement and wave movement
