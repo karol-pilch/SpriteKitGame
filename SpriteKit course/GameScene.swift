@@ -133,26 +133,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			})
 		}
 		
-		// Add the sea on the bottom
-		let sea = Sea(width: self.size.width, size: 80)
-		sea.baseColor = UIColor(red: 38 / 256, green: 118 / 256, blue: 254 / 256, alpha: 1)
-		sea.colorRange = 0.4
-		sea.wavePositionRange = 0.3
-		sea.waveDensity = 2.1
-		sea.position = CGPoint(x: self.size.width / 2, y: 40)
+		// Add the sea on the bottom, in three 'layers'
+		let baseY = 60.0
+		let baseSize = 120.0
+		for i in 1...3 {
+			let factor = Double(i)
+			let y = CGFloat(baseY * ((1 / -factor) + 2))
+			let size = CGFloat(baseSize * factor / pow(factor, 2))
+			
+			let sea = Sea(width: self.size.width, size: size)
+			sea.baseColor = UIColor(red: 145 / 256, green: 178 / 256, blue: 211 / 256, alpha: 1)
+			sea.colorRange = 0.2
+			sea.wavePositionRange = 0.3
+			sea.waveDensity = 2.1
+			sea.position = CGPoint(x: self.size.width / 2, y: y)
+			sea.zPosition = CGFloat(-i)
+			
+			let seaBody = SKPhysicsBody(circleOfRadius: 1)
+			seaBody.affectedByGravity = false
+			seaBody.allowsRotation = false
+			seaBody.dynamic = false
+			
+			seaBody.categoryBitMask = NodeCategory.Obstacle | NodeCategory.Sea
+			seaBody.contactTestBitMask = NodeCategory.None
+			seaBody.collisionBitMask = NodeCategory.None
+			sea.physicsBody = seaBody
+			sea.ready = true
+			self.addChild(sea)
+		}
 		
-		let seaBody = SKPhysicsBody(circleOfRadius: 1)
-		seaBody.affectedByGravity = false
-		seaBody.allowsRotation = false
-		seaBody.dynamic = false
-		
-		seaBody.categoryBitMask = NodeCategory.Obstacle | NodeCategory.Sea
-		seaBody.contactTestBitMask = NodeCategory.None
-		seaBody.collisionBitMask = NodeCategory.None
-		sea.physicsBody = seaBody
-		sea.ready = true
-		self.addChild(sea)
-	}
+			}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
 		if let firstTouch = touches.first {
