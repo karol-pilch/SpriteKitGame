@@ -10,6 +10,8 @@
 		5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F15152F1C88BCAD0005C8EB /* Ball.sks */; };
 		5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F572E991C777ABD00D40E5F /* MainMenu.sks */; };
 		5F572E9C1C777B1B00D40E5F /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F572E9B1C777B1B00D40E5F /* MainMenu.swift */; };
+		5F62BB041CB12C8700013A37 /* Splash.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F62BB031CB12C8700013A37 /* Splash.sks */; };
+		5F62BB061CB130CF00013A37 /* splash.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5F62BB051CB130CF00013A37 /* splash.mp3 */; };
 		5F6868731CA0719300940ACD /* Sea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F6868721CA0719300940ACD /* Sea.swift */; };
 		5F6E170E1C9201D800B9C883 /* SparkParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F6E170C1C9201D800B9C883 /* SparkParticle.sks */; };
 		5F818A251C9EE400003CF1EC /* peg.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5F818A221C9EE400003CF1EC /* peg.wav */; };
@@ -47,6 +49,8 @@
 		5F15152F1C88BCAD0005C8EB /* Ball.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Ball.sks; sourceTree = "<group>"; };
 		5F572E991C777ABD00D40E5F /* MainMenu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenu.sks; sourceTree = "<group>"; };
 		5F572E9B1C777B1B00D40E5F /* MainMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		5F62BB031CB12C8700013A37 /* Splash.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Splash.sks; sourceTree = "<group>"; };
+		5F62BB051CB130CF00013A37 /* splash.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = splash.mp3; sourceTree = "<group>"; };
 		5F6868721CA0719300940ACD /* Sea.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sea.swift; sourceTree = "<group>"; };
 		5F6E170C1C9201D800B9C883 /* SparkParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = SparkParticle.sks; sourceTree = "<group>"; };
 		5F818A221C9EE400003CF1EC /* peg.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = peg.wav; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 		5F818A281C9EE417003CF1EC /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				5F62BB051CB130CF00013A37 /* splash.mp3 */,
 				5F818A221C9EE400003CF1EC /* peg.wav */,
 				5F818A231C9EE400003CF1EC /* plum.wav */,
 				5F818A241C9EE400003CF1EC /* shot.wav */,
@@ -138,6 +143,7 @@
 				5F90F9491C5FF45700B119DB /* GameViewController.swift */,
 				5F90F94B1C5FF45700B119DB /* Main.storyboard */,
 				5F90F94E1C5FF45700B119DB /* Assets.xcassets */,
+				5F62BB031CB12C8700013A37 /* Splash.sks */,
 				5F90F9501C5FF45700B119DB /* LaunchScreen.storyboard */,
 				5F90F9531C5FF45700B119DB /* Info.plist */,
 				5F818A281C9EE417003CF1EC /* Sounds */,
@@ -275,6 +281,8 @@
 				5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */,
 				5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */,
 				5F90F9521C5FF45700B119DB /* LaunchScreen.storyboard in Resources */,
+				5F62BB041CB12C8700013A37 /* Splash.sks in Resources */,
+				5F62BB061CB130CF00013A37 /* splash.mp3 in Resources */,
 				5F90F94F1C5FF45700B119DB /* Assets.xcassets in Resources */,
 				5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */,
 				5F818A261C9EE400003CF1EC /* plum.wav in Resources */,

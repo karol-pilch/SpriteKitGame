@@ -77,14 +77,7 @@ internal class Sea: SKNode {
 	// Applies physics properties to bodies of children
 	override var physicsBody: SKPhysicsBody? {
 		get {
-			var waveBodies: [SKPhysicsBody] = []
-			self.enumerateChildNodesWithName("wave") { (node: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) -> Void in
-				if let wave = node as? SKSpriteNode {
-					if wave.physicsBody != nil { waveBodies.append(wave.physicsBody!) }
-				}
-			}
-			
-			return SKPhysicsBody(bodies: waveBodies)
+			return nil
 		}
 		set {
 			if let newBody = newValue {
@@ -105,8 +98,8 @@ internal class Sea: SKNode {
 						}
 						else {
 							wave.physicsBody?.categoryBitMask = self.physicsConfiguration!.categoryBitMask
-							wave.physicsBody?.collisionBitMask = self.physicsConfiguration!.categoryBitMask
-							wave.physicsBody?.contactTestBitMask = self.physicsConfiguration!.contactTestBitMask
+							wave.physicsBody?.collisionBitMask = self.physicsConfiguration!.collisionBitMask ^ self.physicsConfiguration!.categoryBitMask
+							wave.physicsBody?.contactTestBitMask = self.physicsConfiguration!.contactTestBitMask ^ self.physicsConfiguration!.categoryBitMask
 						}
 					}
 				}
@@ -159,12 +152,14 @@ internal class Sea: SKNode {
 	
 	// Adds physics body to a wave if one has been configured for the Sea
 	private func addPhysicsBodyToWave(wave: SKSpriteNode) {
+		if wave.physicsBody != nil { return }	// Don't replace the physics body
+		
 		if let config = physicsConfiguration {
 			let texture = SKTexture(imageNamed: "wave-white")
 			let newBody = SKPhysicsBody(texture: texture, size: CGSize(width: texture.size().width / texture.size().height * waveSize, height: waveSize))
 			newBody.categoryBitMask = config.categoryBitMask
-			newBody.collisionBitMask = config.collisionBitMask
-			newBody.contactTestBitMask = config.contactTestBitMask
+			newBody.collisionBitMask = config.collisionBitMask ^ config.categoryBitMask
+			newBody.contactTestBitMask = config.contactTestBitMask ^ config.categoryBitMask
 			newBody.affectedByGravity = config.affectedByGravity
 			newBody.allowsRotation = config.allowsRotation
 			newBody.dynamic = config.dynamic
@@ -198,8 +193,6 @@ internal class Sea: SKNode {
 		
 		if !ready { return }
 		
-		print("adding waves")
-		
 		// Remove all old waves
 		enumerateChildNodesWithName("wave") { (wave: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) in
 			wave.removeFromParent()
@@ -216,7 +209,7 @@ internal class Sea: SKNode {
 			wave.zPosition = Randomizer.between(0.0, 10.0)
 			
 			// Add motion
-			let radius = Randomizer.randomize(distance, factor: wavePositionRange) / 2
+			let radius = Randomizer.randomize(waveSize, factor: wavePositionRange) / 4
 			wave.position = CGPoint(x: wave.position.x - radius, y: wave.position.y - radius)
 			let period = NSTimeInterval(Randomizer.randomize(2, factor: 0.5))
 			

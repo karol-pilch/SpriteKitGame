@@ -51,7 +51,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		static let Ball: UInt32						= 0b1 << 5	// 32
 		static let FlyThrough: UInt32			= 0b1 << 6	// 64
 		static let Bucket: UInt32					= 0b1 << 7	// 128
-		static let Floor: UInt32					= 0b1 << 8	// 256
+		static let Sea: UInt32						= 0b1 << 8	// 256
 		
 		static let None: UInt32						= 0
 		static let All: UInt32						= UINT32_MAX
@@ -124,8 +124,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Blue
 						case "leftWall", "rightWall":
 							node.physicsBody!.categoryBitMask = NodeCategory.Obstacle
-						case "floor":
-							node.physicsBody!.categoryBitMask = NodeCategory.Floor | NodeCategory.Sparks
 						case "bucket":
 							node.physicsBody!.categoryBitMask = NodeCategory.Bucket
 							self.wobbleBucket(node, delta: 15)
@@ -140,19 +138,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		sea.baseColor = UIColor(red: 38 / 256, green: 118 / 256, blue: 254 / 256, alpha: 1)
 		sea.colorRange = 0.4
 		sea.wavePositionRange = 0.3
-		sea.waveDensity = 2.5
-		sea.position = CGPoint(x: self.size.width / 2, y: 100)
+		sea.waveDensity = 2.1
+		sea.position = CGPoint(x: self.size.width / 2, y: 40)
 		
 		let seaBody = SKPhysicsBody(circleOfRadius: 1)
 		seaBody.affectedByGravity = false
 		seaBody.allowsRotation = false
 		seaBody.dynamic = false
 		
-		seaBody.categoryBitMask = NodeCategory.Floor
+		seaBody.categoryBitMask = NodeCategory.Obstacle | NodeCategory.Sea
 		seaBody.contactTestBitMask = NodeCategory.None
-		
-		// TODO it breaks here :(
-		// sea.physicsBody = seaBody
+		seaBody.collisionBitMask = NodeCategory.None
+		sea.physicsBody = seaBody
 		sea.ready = true
 		self.addChild(sea)
 	}
@@ -244,8 +241,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Since all of our objects except for walls have their contact category as 0, they won't notify us about a collision.
 		// Only the ball will, so we're sure that one of the bodies is the ball.
 		
-		print("contact")
-		
 		let ball: SKPhysicsBody	// We don't need it for now
 		let other: SKPhysicsBody
 		if (contact.bodyA.categoryBitMask == NodeCategory.Ball) {
@@ -267,8 +262,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.runAction(SKAction.playSoundFileNamed("peg.wav", waitForCompletion: false))
 		}
 		
-		if otherMask & NodeCategory.Floor != 0 {
+		if otherMask & NodeCategory.Sea != 0 {
 			ball.node?.removeFromParent()
+			emitSplash(contact.contactPoint)
 		}
 		
 	
@@ -296,5 +292,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			spark.position = position
 			addChild(spark)
 		}
+	}
+	
+	func emitSplash(position: CGPoint) {
+		if let splash = SKEmitterNode(fileNamed: "Splash") {
+			splash.position = position
+			addChild(splash)
+		}
+		
+		self.runAction(SKAction.playSoundFileNamed("splash.mp3", waitForCompletion: false))
 	}
 }
