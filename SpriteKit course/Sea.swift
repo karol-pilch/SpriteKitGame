@@ -107,6 +107,14 @@ internal class Sea: SKNode {
 		}
 	}
 	
+	override var zPosition: CGFloat {
+		didSet {
+			enumerateChildNodesWithName("wave") { (wave: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) in
+				wave.zPosition = Randomizer.randomize(self.zPosition, factor: 0.01)
+			}
+		}
+	}
+	
 	// Must be set to true before showing.
 	var ready: Bool = false {
 		didSet {
@@ -206,7 +214,7 @@ internal class Sea: SKNode {
 			let y = -waveSize / 2 + Randomizer.randomize(distance, factor: wavePositionRange)
 			let wave = newWave(CGPoint(x: x, y: y))
 			
-			wave.zPosition = Randomizer.between(0.0, 10.0)
+			wave.zPosition = Randomizer.randomize(self.zPosition, factor: 0.01)
 			
 			// Add motion
 			let radius = Randomizer.randomize(waveSize, factor: wavePositionRange) / 4

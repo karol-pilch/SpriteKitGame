@@ -80,7 +80,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var score: Int = 0
 	
 	var touchLocation: CGPoint = CGPointZero
-	
+	var backgroundMusic: SKAudioNode? = nil
 	
 
 	
@@ -134,11 +134,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Add the sea on the bottom, in three 'layers'
-		let baseY = 60.0
+		let baseY = 30.0
 		let baseSize = 120.0
-		for i in 1...3 {
+		for i in 1...1 { // DEBUG FIXME
 			let factor = Double(i)
-			let y = CGFloat(baseY * ((1 / -factor) + 2))
+			let y = CGFloat(baseY * ((1 / -factor) + 2.1))
 			let size = CGFloat(baseSize * factor / pow(factor, 2))
 			
 			let sea = Sea(width: self.size.width, size: size)
@@ -162,7 +162,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(sea)
 		}
 		
-			}
+		// Start playing the background music
+		// HERE: This doesn't work on crappy imac... Test on mine?
+		backgroundMusic = SKAudioNode(fileNamed: "background.mp3")
+		if backgroundMusic != nil {
+			self.addChild(backgroundMusic!)
+		}
+		else {
+			print("Not adding.")
+		}
+		
+	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
 		if let firstTouch = touches.first {
@@ -307,6 +317,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	func emitSplash(position: CGPoint) {
 		if let splash = SKEmitterNode(fileNamed: "Splash") {
 			splash.position = position
+			splash.setScale(2)
 			addChild(splash)
 		}
 		

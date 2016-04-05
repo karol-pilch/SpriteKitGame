@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		570DACBD1CB3ECAC004EA2B4 /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 570DACBC1CB3ECAC004EA2B4 /* background.mp3 */; };
 		5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F15152F1C88BCAD0005C8EB /* Ball.sks */; };
 		5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F572E991C777ABD00D40E5F /* MainMenu.sks */; };
 		5F572E9C1C777B1B00D40E5F /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F572E9B1C777B1B00D40E5F /* MainMenu.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		570DACBC1CB3ECAC004EA2B4 /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
 		5F15152F1C88BCAD0005C8EB /* Ball.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Ball.sks; sourceTree = "<group>"; };
 		5F572E991C777ABD00D40E5F /* MainMenu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenu.sks; sourceTree = "<group>"; };
 		5F572E9B1C777B1B00D40E5F /* MainMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 		5F818A281C9EE417003CF1EC /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				570DACBC1CB3ECAC004EA2B4 /* background.mp3 */,
 				5F62BB051CB130CF00013A37 /* splash.mp3 */,
 				5F818A221C9EE400003CF1EC /* peg.wav */,
 				5F818A231C9EE400003CF1EC /* plum.wav */,
@@ -277,6 +280,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F818A271C9EE400003CF1EC /* shot.wav in Resources */,
+				570DACBD1CB3ECAC004EA2B4 /* background.mp3 in Resources */,
 				5F6E170E1C9201D800B9C883 /* SparkParticle.sks in Resources */,
 				5F1515301C88BCAD0005C8EB /* Ball.sks in Resources */,
 				5F90F9461C5FF45700B119DB /* GameScene.sks in Resources */,
@@ -456,11 +460,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "SpriteKit course/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-course";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -468,11 +475,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "SpriteKit course/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "edu.karoop.SpriteKit-course";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
