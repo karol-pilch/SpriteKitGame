@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import AVFoundation
 
 extension CGPoint {
 	func distanceFrom (other: CGPoint) -> CGFloat {
@@ -80,7 +81,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var score: Int = 0
 	
 	var touchLocation: CGPoint = CGPointZero
-	var backgroundMusic: SKAudioNode? = nil
+	var backgroundMusic: SKAudioNode!
 	
 
 	
@@ -134,19 +135,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Add the sea on the bottom, in three 'layers'
-		let baseY = 30.0
-		let baseSize = 120.0
-		for i in 1...1 { // DEBUG FIXME
+		var y = 20.0
+		var size = 170.0
+		for i in 1...2 { // DEBUG FIXME
 			let factor = Double(i)
-			let y = CGFloat(baseY * ((1 / -factor) + 2.1))
-			let size = CGFloat(baseSize * factor / pow(factor, 2))
+			if i > 1 {
+				y += size / 2.5
+			}
+			size = size * factor / pow(factor, 2)
 			
-			let sea = Sea(width: self.size.width, size: size)
+			let sea = Sea(width: self.size.width, size: CGFloat(size))
 			sea.baseColor = UIColor(red: 145 / 256, green: 178 / 256, blue: 211 / 256, alpha: 1)
 			sea.colorRange = 0.2
 			sea.wavePositionRange = 0.3
-			sea.waveDensity = 2.1
-			sea.position = CGPoint(x: self.size.width / 2, y: y)
+			sea.waveDensity = 2.6
+			sea.position = CGPoint(x: self.size.width / 2, y: CGFloat(y))
 			sea.zPosition = CGFloat(-i)
 			
 			let seaBody = SKPhysicsBody(circleOfRadius: 1)
@@ -163,15 +166,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Start playing the background music
-		// HERE: This doesn't work on crappy imac... Test on mine?
-		backgroundMusic = SKAudioNode(fileNamed: "background.mp3")
-		if backgroundMusic != nil {
-			self.addChild(backgroundMusic!)
-		}
-		else {
-			print("Not adding.")
-		}
-		
+		runAction(SKAction.waitForDuration(0.1), completion: {
+			let music = SKAudioNode(fileNamed: "background.mp3")
+			self.addChild(music)
+			self.backgroundMusic = music
+		})
 	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
