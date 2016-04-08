@@ -76,6 +76,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	   fied that the contact occurred.
 */
 	
+/*
+	And a little bit about gravity fields
+	=====================================
+	
+	Gravity fields can be added to the scene in the scene editor. Probably in code as well,
+	but that wasn't explained in the course. They define different kinds of gravity.
+	What's really cool is that you can define category masks on the fields, and then field 
+	masks on nodes, and this way control which nodes are affected by which field.
+*/
+	
+/*
+	Homework
+	========
+	
+	1. Animate the ball as it travels
+	2. Add smoke to the ball
+	3. Finish the camera video.
+
+*/
+	
 	var cannon: SKSpriteNode!
 	var cannonPosition = CGPointZero
 	var score: Int = 0
@@ -171,6 +191,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			self.addChild(music)
 			self.backgroundMusic = music
 		})
+		
+		// Preload sounds used in the scene
+		let sounds = ["splash.mp3", "peg", "plum", "shot"]
+		for sound in sounds {
+			let fileName: String
+			let fileExtension: String
+			if let dotRange = sound.rangeOfString(".") {
+				fileName = sound.substringToIndex(dotRange.startIndex)
+				fileExtension = sound.substringFromIndex(dotRange.startIndex)
+			}
+			else {
+				fileName = sound
+				fileExtension = "wav"
+			}
+			if let path = NSBundle.mainBundle().pathForResource(fileName, ofType: fileExtension) {
+				do {
+					let player = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: path))
+					player.prepareToPlay()
+				} catch {
+					print("Could not preload the sound \"\(sound)\".")
+				}
+			}
+		}
 	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
