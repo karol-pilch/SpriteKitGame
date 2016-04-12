@@ -226,6 +226,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		// If I understand correctly, the code below creates a new scene and takes the ball from it every time... Hmm.
 		if let ball = SKScene(fileNamed: "Ball")?.childNodeWithName("ball") {
+			// Add smoke
+			if let smoke = SKEmitterNode(fileNamed: "Smoke") {
+				smoke.targetNode = self
+				ball.addChild(smoke)
+			}
+			
 			// Insert the ball to the scene
 			ball.removeFromParent()
 			self.addChild(ball)
