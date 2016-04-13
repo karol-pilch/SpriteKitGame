@@ -103,27 +103,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var touchLocation: CGPoint = CGPointZero
 	var backgroundMusic: SKAudioNode!
 	
-
-	
-	func ballVector(ballPosition ballPosition: CGPoint, touchPosition: CGPoint, maxLength:CGFloat = 150) -> CGVector {
-		let distance = touchPosition.distanceFrom(ballPosition)
-		let vectorLength = maxLength - maxLength / (distance / maxLength * 3 - 1)
-		// print("Distance: \(distance), ball vector strength: \(vectorLength)")
-		return CGVector(
-			dx: (vectorLength / maxLength) * (touchPosition.x - ballPosition.x),
-			dy: (vectorLength / maxLength) * (touchPosition.y - ballPosition.y))
-	}
-	
-	func wobbleBucket(bucket: SKNode, delta: Double) {
-		let duration: NSTimeInterval = 0.5
-		let moveUp = SKAction.moveBy(CGVector(dx: 0, dy: delta), duration: duration * 1.2)
-		moveUp.timingMode = SKActionTimingMode.EaseInEaseOut
-		let moveDown = SKAction.moveBy(CGVector(dx: 0, dy: -delta), duration: duration)
-		moveDown.timingMode = SKActionTimingMode.EaseInEaseOut
-		let wobbleSequence = SKAction.sequence([moveUp, moveDown, SKAction.waitForDuration(duration)])
-		bucket.runAction(SKAction.repeatActionForever(wobbleSequence))
-	}
-	
 	override func didMoveToView(view: SKView) {
 		// Need to set up self as the contact delegate
 		self.physicsWorld.contactDelegate = self;
@@ -223,30 +202,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-		
-		// If I understand correctly, the code below creates a new scene and takes the ball from it every time... Hmm.
-		if let ball = SKScene(fileNamed: "Ball")?.childNodeWithName("ball") {
-			// Add smoke
-			if let smoke = SKEmitterNode(fileNamed: "Smoke") {
-				smoke.targetNode = self
-				ball.addChild(smoke)
-			}
-			
-			// Insert the ball to the scene
-			ball.removeFromParent()
-			self.addChild(ball)
-			
-			// Move it to the base of the cannon
-			let cannonPosition = absolutePosition(cannon)!
-			ball.position = cannonPosition
-			ball.physicsBody?.categoryBitMask = NodeCategory.Ball
-			ball.physicsBody?.collisionBitMask = NodeCategory.All - NodeCategory.FlyThrough
-			
-			// Shoot it out (instead of just dropping)
-			if let touchPosition = touches.first?.locationInNode(self) {
-				ball.physicsBody?.applyImpulse(ballVector(ballPosition: cannonPosition, touchPosition: touchPosition))
-				cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
-			}
+		if let touch = touches.first {
+			shootBall(fromPosition: absolutePosition(cannon)!, targetPosition: touch.locationInNode(self))
 		}
 	}
 	
@@ -263,6 +220,132 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	var backgroundNodeColor: UIColor? = nil
+	
+	func didBeginContact(contact: SKPhysicsContact) {
+		// Since all of our objects except for walls have their contact category as 0, they won't notify us about a collision.
+		// Only the ball will, so we're sure that one of the bodies is the ball.
+		
+		let ball: SKPhysicsBody	// We don't need it for now
+		let other: SKPhysicsBody
+		if (contact.bodyA.categoryBitMask == NodeCategory.Ball) {
+			ball = contact.bodyA
+			other = contact.bodyB
+		}
+		else {
+			ball = contact.bodyB
+			other = contact.bodyA
+		}
+		
+		let otherMask = other.categoryBitMask
+		
+		if otherMask & NodeCategory.Obstacle != 0 {
+		}
+		
+		if otherMask & NodeCategory.Destructible != 0 {
+			other.node?.removeFromParent()
+			self.runAction(SKAction.playSoundFileNamed("peg.wav", waitForCompletion: false))
+		}
+		
+		if otherMask & NodeCategory.Sea != 0 {
+			ball.node?.removeFromParent()
+			emitSplash(contact.contactPoint)
+		}
+		
+	
+		if otherMask & NodeCategory.Bucket != 0 {
+			bucketHit(ball.node)
+		}
+		
+		if otherMask & NodeCategory.Sparks != 0 {
+			
+			// See if the node has a colour category
+			let color: UIColor?
+			if otherMask & NodeCategory.Orange != 0 { color = orangeColor }
+			else if otherMask & NodeCategory.Blue != 0 { color = blueColor }
+			else { color = nil }
+			
+			emitSparks(contact.contactPoint, color: color)
+		}
+	}
+	
+	func emitSparks(position: CGPoint, color: UIColor? = nil) {
+		if let spark = SKEmitterNode(fileNamed: "SparkParticle") {
+			spark.particleColorSequence = nil
+			spark.particleColor = color ?? spark.particleColor
+			spark.position = position
+			addChild(spark)
+		}
+	}
+	
+	func emitSplash(position: CGPoint) {
+		if let splash = SKEmitterNode(fileNamed: "Splash") {
+			splash.position = position
+			splash.setScale(2)
+			addChild(splash)
+		}
+		
+		self.runAction(SKAction.playSoundFileNamed("splash.mp3", waitForCompletion: false))
+	}
+	
+	func shootBall(fromPosition fromPosition: CGPoint, targetPosition: CGPoint, radius: CGFloat = 30) {
+		
+		// Make a new node
+		let ball = SKSpriteNode(imageNamed: "ball1")
+		ball.size.width = 2 * radius
+		ball.size.height = 2 * radius
+		ball.position = fromPosition
+		
+		// Animate the node
+		var ballTextures: [SKTexture] = []
+		for i in 1...5 {
+			ballTextures.append(SKTexture(imageNamed: "ball\(i)"))
+		}
+		
+		let ballAnimation = SKAction.animateWithTextures(ballTextures, timePerFrame: 0.1)
+		ball.runAction(SKAction.repeatActionForever(ballAnimation))
+		
+		// Configure physics body
+		ball.physicsBody = SKPhysicsBody(circleOfRadius: radius)
+		ball.physicsBody?.linearDamping = 0.1
+		ball.physicsBody?.angularDamping = 0.1
+		ball.physicsBody?.mass = 0.1256
+		
+		// Categorise the ball
+		ball.physicsBody?.categoryBitMask = NodeCategory.Ball
+		ball.physicsBody?.contactTestBitMask = NodeCategory.All
+		ball.physicsBody?.collisionBitMask = NodeCategory.All - NodeCategory.FlyThrough
+		
+		// Add smoke
+		if let smoke = SKEmitterNode(fileNamed: "Smoke") {
+			smoke.targetNode = self
+			ball.addChild(smoke)
+		}
+		
+		// Shoot it out!
+		self.addChild(ball)
+		ball.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition))
+		cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
+		
+	}
+	
+	func ballVector(ballPosition ballPosition: CGPoint, touchPosition: CGPoint, maxLength:CGFloat = 150) -> CGVector {
+		let distance = touchPosition.distanceFrom(ballPosition)
+		let vectorLength = maxLength - maxLength / (distance / maxLength * 3 - 1)
+		// print("Distance: \(distance), ball vector strength: \(vectorLength)")
+		return CGVector(
+			dx: (vectorLength / maxLength) * (touchPosition.x - ballPosition.x),
+			dy: (vectorLength / maxLength) * (touchPosition.y - ballPosition.y))
+	}
+	
+	func wobbleBucket(bucket: SKNode, delta: Double) {
+		let duration: NSTimeInterval = 0.5
+		let moveUp = SKAction.moveBy(CGVector(dx: 0, dy: delta), duration: duration * 1.2)
+		moveUp.timingMode = SKActionTimingMode.EaseInEaseOut
+		let moveDown = SKAction.moveBy(CGVector(dx: 0, dy: -delta), duration: duration)
+		moveDown.timingMode = SKActionTimingMode.EaseInEaseOut
+		let wobbleSequence = SKAction.sequence([moveUp, moveDown, SKAction.waitForDuration(duration)])
+		bucket.runAction(SKAction.repeatActionForever(wobbleSequence))
+	}
 	
 	func bucketHit(ball: SKNode?) {
 		score = score + 1;
@@ -302,73 +385,5 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		label?.xScale = 1
 		label?.yScale = 1
 		label?.runAction(SKAction.sequence([scaleUp, scaleDown]))
-	}
-
-	
-	func didBeginContact(contact: SKPhysicsContact) {
-		// Since all of our objects except for walls have their contact category as 0, they won't notify us about a collision.
-		// Only the ball will, so we're sure that one of the bodies is the ball.
-		
-		let ball: SKPhysicsBody	// We don't need it for now
-		let other: SKPhysicsBody
-		if (contact.bodyA.categoryBitMask == NodeCategory.Ball) {
-			ball = contact.bodyA
-			other = contact.bodyB
-		}
-		else {
-			ball = contact.bodyB
-			other = contact.bodyA
-		}
-		
-		let otherMask = other.categoryBitMask
-		
-		if otherMask & NodeCategory.Obstacle != 0 {
-		}
-		
-		if otherMask & NodeCategory.Destructible != 0 {
-			other.node?.removeFromParent()
-			self.runAction(SKAction.playSoundFileNamed("peg.wav", waitForCompletion: false))
-		}
-		
-		if otherMask & NodeCategory.Sea != 0 {
-			ball.node?.removeFromParent()
-			emitSplash(contact.contactPoint)
-		}
-		
-	
-		if otherMask & NodeCategory.Bucket != 0 {
-			bucketHit(ball.node)
-		}
-		
-		if otherMask & NodeCategory.Sparks != 0 {
-			// Sparking node contact
-			
-			// See if the node has a colour category
-			let color: UIColor?
-			if otherMask & NodeCategory.Orange != 0 { color = orangeColor }
-			else if otherMask & NodeCategory.Blue != 0 { color = blueColor }
-			else { color = nil }
-			
-			emitSparks(contact.contactPoint, color: color)
-		}
-	}
-	
-	func emitSparks(position: CGPoint, color: UIColor? = nil) {
-		if let spark = SKEmitterNode(fileNamed: "SparkParticle") {
-			spark.particleColorSequence = nil
-			spark.particleColor = color ?? spark.particleColor
-			spark.position = position
-			addChild(spark)
-		}
-	}
-	
-	func emitSplash(position: CGPoint) {
-		if let splash = SKEmitterNode(fileNamed: "Splash") {
-			splash.position = position
-			splash.setScale(2)
-			addChild(splash)
-		}
-		
-		self.runAction(SKAction.playSoundFileNamed("splash.mp3", waitForCompletion: false))
 	}
 }
