@@ -217,9 +217,9 @@ internal class Sea: SKNode {
 			wave.zPosition = Randomizer.randomize(self.zPosition, factor: 0.01)
 			
 			// Add motion
-			let radius = Randomizer.randomize(waveSize, factor: wavePositionRange) / 4
+			let radius = Randomizer.randomize(waveSize, factor: wavePositionRange) / 6
 			wave.position = CGPoint(x: wave.position.x - radius, y: wave.position.y - radius)
-			let period = NSTimeInterval(Randomizer.randomize(2, factor: 0.5))
+			let period = NSTimeInterval(Randomizer.randomize(3, factor: 0.5))
 			
 			// Circular motion
 			let circle: CGMutablePathRef = CGPathCreateMutable()

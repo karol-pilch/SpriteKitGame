@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import AVFoundation
 
 extension CGPoint {
 	func distanceFrom (other: CGPoint) -> CGFloat {
@@ -75,12 +76,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	   fied that the contact occurred.
 */
 	
+/*
+	And a little bit about gravity fields
+	=====================================
+	
+	Gravity fields can be added to the scene in the scene editor. Probably in code as well,
+	but that wasn't explained in the course. They define different kinds of gravity.
+	What's really cool is that you can define category masks on the fields, and then field 
+	masks on nodes, and this way control which nodes are affected by which field.
+*/
+	
+/*
+	Homework
+	========
+	
+	1. Animate the ball as it travels
+	2. Add smoke to the ball
+	3. Finish the camera video.
+
+*/
+	
 	var cannon: SKSpriteNode!
 	var cannonPosition = CGPointZero
 	var score: Int = 0
 	
 	var touchLocation: CGPoint = CGPointZero
-	var backgroundMusic: SKAudioNode? = nil
+	var backgroundMusic: SKAudioNode!
 	
 
 	
@@ -134,19 +155,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Add the sea on the bottom, in three 'layers'
-		let baseY = 30.0
-		let baseSize = 120.0
-		for i in 1...1 { // DEBUG FIXME
+		var y = 20.0
+		var size = 170.0
+		for i in 1...2 { // DEBUG FIXME
 			let factor = Double(i)
-			let y = CGFloat(baseY * ((1 / -factor) + 2.1))
-			let size = CGFloat(baseSize * factor / pow(factor, 2))
+			if i > 1 {
+				y += size / 2.5
+			}
+			size = size * factor / pow(factor, 2)
 			
-			let sea = Sea(width: self.size.width, size: size)
+			let sea = Sea(width: self.size.width, size: CGFloat(size))
 			sea.baseColor = UIColor(red: 145 / 256, green: 178 / 256, blue: 211 / 256, alpha: 1)
 			sea.colorRange = 0.2
 			sea.wavePositionRange = 0.3
-			sea.waveDensity = 2.1
-			sea.position = CGPoint(x: self.size.width / 2, y: y)
+			sea.waveDensity = 2.6
+			sea.position = CGPoint(x: self.size.width / 2, y: CGFloat(y))
 			sea.zPosition = CGFloat(-i)
 			
 			let seaBody = SKPhysicsBody(circleOfRadius: 1)
@@ -163,15 +186,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Start playing the background music
-		// HERE: This doesn't work on crappy imac... Test on mine?
-		backgroundMusic = SKAudioNode(fileNamed: "background.mp3")
-		if backgroundMusic != nil {
-			self.addChild(backgroundMusic!)
-		}
-		else {
-			print("Not adding.")
-		}
+		runAction(SKAction.waitForDuration(0.1), completion: {
+			let music = SKAudioNode(fileNamed: "background.mp3")
+			self.addChild(music)
+			self.backgroundMusic = music
+		})
 		
+		// Preload sounds used in the scene
+		let sounds = ["splash.mp3", "peg", "plum", "shot"]
+		for sound in sounds {
+			let fileName: String
+			let fileExtension: String
+			if let dotRange = sound.rangeOfString(".") {
+				fileName = sound.substringToIndex(dotRange.startIndex)
+				fileExtension = sound.substringFromIndex(dotRange.startIndex)
+			}
+			else {
+				fileName = sound
+				fileExtension = "wav"
+			}
+			if let path = NSBundle.mainBundle().pathForResource(fileName, ofType: fileExtension) {
+				do {
+					let player = try AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: path))
+					player.prepareToPlay()
+				} catch {
+					print("Could not preload the sound \"\(sound)\".")
+				}
+			}
+		}
 	}
 	
 	override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -184,6 +226,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		// If I understand correctly, the code below creates a new scene and takes the ball from it every time... Hmm.
 		if let ball = SKScene(fileNamed: "Ball")?.childNodeWithName("ball") {
+			// Add smoke
+			if let smoke = SKEmitterNode(fileNamed: "Smoke") {
+				smoke.targetNode = self
+				ball.addChild(smoke)
+			}
+			
 			// Insert the ball to the scene
 			ball.removeFromParent()
 			self.addChild(ball)
