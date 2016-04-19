@@ -18,10 +18,12 @@ extension CGPoint {
 }
 
 extension SKScene {
-	func absolutePosition(node: SKNode) -> CGPoint? {
-		var result = node.position
+	func absolutePosition(node: SKNode?) -> CGPoint? {
+		if node == nil { return nil }
 		
-		var parent = node.parent
+		var result = node!.position
+		
+		var parent = node!.parent
 		while (parent != nil) {
 			if let node = parent {
 				if node.isEqualToNode(self) { return result }	// Returning result only for own children
@@ -226,11 +228,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Calculate the cannon angle and update it
 		let newAngle = atan2((touchLocation.x - cannonPosition.x), (touchLocation.y - cannonPosition.y))
 		cannon.zRotation = -newAngle + CGFloat(M_PI/2)
-		
-		if let focus = focusNode {
-			followCam?.zRotation = -focus.zRotation
-			print("Ball: \(focus.zRotation), Cam: \(followCam?.zRotation)")
-		}
 	}
 	
 	var backgroundNodeColor: UIColor? = nil
@@ -261,14 +258,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		if otherMask & NodeCategory.Sea != 0 {
-			moveCameraToNode(self)
+			followNode(self)
 			ball.node?.removeFromParent()
 			emitSplash(contact.contactPoint)
 		}
 		
 	
 		if otherMask & NodeCategory.Bucket != 0 {
-			moveCameraToNode(self)
+			followNode(self)
 			bucketHit(ball.node)
 		}
 		
@@ -284,28 +281,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 	}
 	
-	func moveCameraToNode(node: SKNode, zoom: CGFloat = 1) {
+	func followNode(node: SKNode, zoom: CGFloat = 1) {
+		// TODO: make camera movements more smooth (with action smoothing function?)
 		if let camera = self.followCam {
-			if (node == self) {
+			if node.isEqualToNode(self) {
 				// Reset the camera position
+				let relativePosition = absolutePosition(camera)
 				camera.removeFromParent()
+				
+				if relativePosition != nil {
+					camera.position = relativePosition!
+				}
+				
 				self.addChild(camera)
-				camera.position = CGPoint(x: 540, y: 960)
-				camera.zRotation = 0
+				camera.runAction(SKAction.moveTo(CGPoint(x: 540, y: 960), duration: 0.5))
 				camera.runAction(SKAction.scaleTo(1, duration: 0.5))
 				
 				self.focusNode = nil
 			}
 			else {
 				// Follow the node
-				camera.removeFromParent()
-				camera.zRotation = -node.zRotation
-				node.addChild(camera)
-				
-				camera.position = CGPoint(x: 0, y: 0)
-				camera.runAction(SKAction.scaleTo(zoom, duration: 0.5))
-				
-				self.focusNode = node
+				if let handle = node.childNodeWithName("cameraHandle") {
+					let oldRelativePosition = absolutePosition(camera)
+					camera.removeFromParent()
+					
+					let nodePosition = absolutePosition(handle)
+					if oldRelativePosition != nil && nodePosition != nil {
+						camera.position = CGPoint(
+							x: oldRelativePosition!.x - nodePosition!.x,
+							y: oldRelativePosition!.y - nodePosition!.y
+						)
+					}
+					
+					handle.addChild(camera)
+					
+					camera.runAction(SKAction.moveTo(CGPoint(x: 0, y: 0), duration: 0.5))
+					camera.runAction(SKAction.scaleTo(zoom, duration: 0.5))
+					
+					self.focusNode = node
+				}
 			}
 		}
 		
@@ -351,7 +365,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		ball.physicsBody = SKPhysicsBody(circleOfRadius: radius)
 		ball.physicsBody?.linearDamping = 0.1
 		ball.physicsBody?.angularDamping = 0.1
-		ball.physicsBody?.mass = 0.1256
+		ball.physicsBody?.mass = 0.12
+		ball.physicsBody?.restitution = 0.3
 		
 		// Categorise the ball
 		ball.physicsBody?.categoryBitMask = NodeCategory.Ball
@@ -364,13 +379,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			ball.addChild(smoke)
 		}
 		
+		// Add camera handle
+		let handle = SKSpriteNode(color: UIColor.redColor(), size: CGSize(width: 1, height: 1))
+		handle.zPosition = -50
+		handle.name = "cameraHandle"
+		handle.physicsBody = SKPhysicsBody(rectangleOfSize: CGSize(width: 1, height: 1))
+		handle.physicsBody?.dynamic = true
+		handle.physicsBody?.pinned = true
+		handle.physicsBody?.angularDamping = 0.0
+		handle.physicsBody?.linearDamping = 0.0
+		handle.physicsBody?.mass = 0.0001
+		handle.physicsBody?.friction = 0.0
+		handle.physicsBody?.categoryBitMask = NodeCategory.None
+		handle.physicsBody?.collisionBitMask = NodeCategory.None
+		
+		ball.addChild(handle)
+		
+		
 		// Shoot it out!
 		self.addChild(ball)
 		ball.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition))
 		cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
 		
 		// Make the camera follow the ball
-		moveCameraToNode(ball, zoom: 0.75)
+		followNode(ball, zoom: 0.75)
 		
 	}
 	
