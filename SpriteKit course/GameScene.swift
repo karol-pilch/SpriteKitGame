@@ -55,6 +55,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		static let FlyThrough: UInt32			= 0b1 << 6	// 64
 		static let Bucket: UInt32					= 0b1 << 7	// 128
 		static let Sea: UInt32						= 0b1 << 8	// 256
+		static let Boundary : UInt32			= 0b1 << 9
 		
 		static let None: UInt32						= 0
 		static let All: UInt32						= UINT32_MAX
@@ -109,7 +110,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 	}
 	
-	var focusNode: SKNode? = nil
+	var hasBall: Bool {
+		get {
+			return self["//ball"].first != nil
+		}
+	}
 	
 	var touchLocation: CGPoint = CGPointZero
 	var backgroundMusic: SKAudioNode!
@@ -123,7 +128,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		if let pos = absolutePosition(cannon) { cannonPosition = pos }
 		
 		// Process nodes in the scene
-		for nodeName in ["rotatingSquare", "orangePeg", "bluePeg", "leftWall", "rightWall", "floor", "bucket"] {
+		for nodeName in ["rotatingSquare", "orangePeg", "bluePeg", "leftWall", "rightWall", "ceiling", "ground", "bucket"] {
 			enumerateChildNodesWithName(nodeName, usingBlock: { (node: SKNode, ptr: UnsafeMutablePointer<ObjCBool>) -> Void in
 				if node.physicsBody != nil {
 					switch nodeName {
@@ -133,8 +138,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Orange
 						case "bluePeg":
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Blue
-						case "leftWall", "rightWall":
-							node.physicsBody!.categoryBitMask = NodeCategory.Obstacle
+						case "leftWall", "rightWall", "ceiling", "ground":
+							node.physicsBody!.categoryBitMask = NodeCategory.Boundary | NodeCategory.Sparks
 						case "bucket":
 							node.physicsBody!.categoryBitMask = NodeCategory.Bucket
 							self.wobbleBucket(node, delta: 15)
@@ -145,7 +150,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		// Add the sea on the bottom, in three 'layers'
-		var y = 20.0
+		var y = -880.0
 		var size = 170.0
 		for i in 1...2 { // DEBUG FIXME
 			let factor = Double(i)
@@ -154,12 +159,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			}
 			size = size * factor / pow(factor, 2)
 			
-			let sea = Sea(width: self.size.width, size: CGFloat(size))
+			let sea = Sea(width: 1080, size: CGFloat(size))
 			sea.baseColor = UIColor(red: 145 / 256, green: 178 / 256, blue: 211 / 256, alpha: 1)
 			sea.colorRange = 0.2
 			sea.wavePositionRange = 0.3
 			sea.waveDensity = 2.6
-			sea.position = CGPoint(x: self.size.width / 2, y: CGFloat(y))
+			sea.position = CGPoint(x: 1425.0, y: CGFloat(y))
 			sea.zPosition = CGFloat(-i)
 			
 			let seaBody = SKPhysicsBody(circleOfRadius: 1)
@@ -167,7 +172,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			seaBody.allowsRotation = false
 			seaBody.dynamic = false
 			
-			seaBody.categoryBitMask = NodeCategory.Obstacle | NodeCategory.Sea
+			seaBody.categoryBitMask = NodeCategory.Boundary | NodeCategory.Sea
 			seaBody.contactTestBitMask = NodeCategory.None
 			seaBody.collisionBitMask = NodeCategory.None
 			sea.physicsBody = seaBody
@@ -249,7 +254,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		let otherMask = other.categoryBitMask
 		
-		if otherMask & NodeCategory.Obstacle != 0 {
+		if otherMask & NodeCategory.Boundary != 0 {
+			followNode(self)
+			ball.node?.removeFromParent()
 		}
 		
 		if otherMask & NodeCategory.Destructible != 0 {
@@ -258,8 +265,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		if otherMask & NodeCategory.Sea != 0 {
-			followNode(self)
-			ball.node?.removeFromParent()
 			emitSplash(contact.contactPoint)
 		}
 		
@@ -281,6 +286,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 	}
 	
+	func moveCamera(to: CGPoint, zoom: CGFloat = 1, duration: NSTimeInterval = 0.5) {
+		if let camera = followCam {
+			let move = SKAction.moveTo(to, duration: duration)
+			move.timingMode = SKActionTimingMode.EaseInEaseOut
+			
+			let zoom = SKAction.scaleTo(zoom, duration: duration)
+			zoom.timingMode = SKActionTimingMode.EaseInEaseOut
+			
+			camera.runAction(move)
+			camera.runAction(zoom)
+
+		}
+	}
+	
 	func followNode(node: SKNode, zoom: CGFloat = 1) {
 		// TODO: make camera movements more smooth (with action smoothing function?)
 		if let camera = self.followCam {
@@ -294,10 +313,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 				}
 				
 				self.addChild(camera)
-				camera.runAction(SKAction.moveTo(CGPoint(x: 540, y: 960), duration: 0.5))
-				camera.runAction(SKAction.scaleTo(1, duration: 0.5))
-				
-				self.focusNode = nil
+				moveCamera(CGPoint(x: -1555, y: 540), zoom: 1, duration: 0.5)
 			}
 			else {
 				// Follow the node
@@ -314,11 +330,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 					}
 					
 					handle.addChild(camera)
-					
-					camera.runAction(SKAction.moveTo(CGPoint(x: 0, y: 0), duration: 0.5))
-					camera.runAction(SKAction.scaleTo(zoom, duration: 0.5))
-					
-					self.focusNode = node
+					moveCamera(CGPoint(x: 0, y: 0), zoom: 0.75, duration: 0.5)
 				}
 			}
 		}
@@ -346,8 +358,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func shootBall(fromPosition fromPosition: CGPoint, targetPosition: CGPoint, radius: CGFloat = 30) {
 		
+		if self.hasBall { return }	// Only allow one ball at a time
+		
 		// Make a new node
 		let ball = SKSpriteNode(imageNamed: "ball1")
+		ball.name = "ball"
 		ball.size.width = 2 * radius
 		ball.size.height = 2 * radius
 		ball.position = fromPosition
@@ -398,7 +413,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		// Shoot it out!
 		self.addChild(ball)
-		ball.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition))
+		ball.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition, maxLength: 250))
 		cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
 		
 		// Make the camera follow the ball
@@ -427,11 +442,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func bucketHit(ball: SKNode?) {
 		score = score + 1;
-		let label = self.childNodeWithName("scoreLabel") as? SKLabelNode
-		label?.text = "\(score) ball\(score > 1 ? "s" : "") in the bucket!"
+		if let label = self["//scoreLabel"].first as? SKLabelNode {
+			label.text = "\(score) ball\(score > 1 ? "s" : "") in the bucket!"
+			
+			// Label size
+			let ratio: CGFloat = 1.3
+			let scaleUp = SKAction.scaleBy(ratio, duration: 0.1)
+			scaleUp.timingMode = SKActionTimingMode.EaseIn
+			let scaleDown = SKAction.scaleBy(1/ratio, duration: 0.2)
+			scaleDown.timingMode = SKActionTimingMode.EaseOut
+			
+			// Cancel old actions and reset scale to 1
+			label.removeAllActions()
+			label.xScale = 1
+			label.yScale = 1
+			label.runAction(SKAction.sequence([scaleUp, scaleDown]))
+		}
+		
 		self.runAction(SKAction.playSoundFileNamed("plum.wav", waitForCompletion: false))
 		ball?.removeFromParent()
-		
 		
 		// Add some actions and animations
 		
@@ -450,18 +479,5 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			backgroundNode.removeAllActions()
 			backgroundNode.runAction(SKAction.sequence([paintNew, paintOld]))
 		}
-		
-		// Label size
-		let ratio: CGFloat = 1.3
-		let scaleUp = SKAction.scaleBy(ratio, duration: 0.1)
-		scaleUp.timingMode = SKActionTimingMode.EaseIn
-		let scaleDown = SKAction.scaleBy(1/ratio, duration: 0.2)
-		scaleDown.timingMode = SKActionTimingMode.EaseOut
-		
-		// Cancel old actions and reset scale to 1
-		label?.removeAllActions()
-		label?.xScale = 1
-		label?.yScale = 1
-		label?.runAction(SKAction.sequence([scaleUp, scaleDown]))
 	}
 }
