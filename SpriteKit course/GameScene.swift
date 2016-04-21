@@ -139,6 +139,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 						case "bluePeg":
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Blue
 						case "leftWall", "rightWall", "ceiling", "ground":
+							if nodeName == "ground" { print("Found ground!") }
 							node.physicsBody!.categoryBitMask = NodeCategory.Boundary | NodeCategory.Sparks
 						case "bucket":
 							node.physicsBody!.categoryBitMask = NodeCategory.Bucket
@@ -251,6 +252,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			ball = contact.bodyB
 			other = contact.bodyA
 		}
+		
+		print("Contact of \(ball.node?.name) with \(other.node?.name)")
 		
 		let otherMask = other.categoryBitMask
 		

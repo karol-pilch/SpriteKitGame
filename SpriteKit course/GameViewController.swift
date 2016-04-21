@@ -19,6 +19,7 @@ class GameViewController: UIViewController {
 			let skView = self.view as! SKView
 			skView.showsFPS = true
 			skView.showsNodeCount = true
+			// skView.showsPhysics = true
 			
 			/* Sprite Kit applies additional optimizations to improve rendering performance */
 			// KP: This makes the view draw without taking siblings order into the account.
