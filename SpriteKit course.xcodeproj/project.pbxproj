@@ -10,6 +10,7 @@
 		570DACBD1CB3ECAC004EA2B4 /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 570DACBC1CB3ECAC004EA2B4 /* background.mp3 */; };
 		57AD7C3F1CB7E545001FDA5A /* Smoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 57AD7C3D1CB7E545001FDA5A /* Smoke.sks */; };
 		57AD7C401CB7E545001FDA5A /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 57AD7C3E1CB7E545001FDA5A /* spark.png */; };
+		5F4110531CCCF89000E3E238 /* explosion.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5F4110521CCCF89000E3E238 /* explosion.wav */; };
 		5F572E9A1C777ABD00D40E5F /* MainMenu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F572E991C777ABD00D40E5F /* MainMenu.sks */; };
 		5F572E9C1C777B1B00D40E5F /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F572E9B1C777B1B00D40E5F /* MainMenu.swift */; };
 		5F62BB041CB12C8700013A37 /* Splash.sks in Resources */ = {isa = PBXBuildFile; fileRef = 5F62BB031CB12C8700013A37 /* Splash.sks */; };
@@ -51,6 +52,7 @@
 		570DACBC1CB3ECAC004EA2B4 /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
 		57AD7C3D1CB7E545001FDA5A /* Smoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Smoke.sks; sourceTree = "<group>"; };
 		57AD7C3E1CB7E545001FDA5A /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		5F4110521CCCF89000E3E238 /* explosion.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explosion.wav; sourceTree = "<group>"; };
 		5F572E991C777ABD00D40E5F /* MainMenu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MainMenu.sks; sourceTree = "<group>"; };
 		5F572E9B1C777B1B00D40E5F /* MainMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		5F62BB031CB12C8700013A37 /* Splash.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Splash.sks; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 		5F818A281C9EE417003CF1EC /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				5F4110521CCCF89000E3E238 /* explosion.wav */,
 				570DACBC1CB3ECAC004EA2B4 /* background.mp3 */,
 				5F62BB051CB130CF00013A37 /* splash.mp3 */,
 				5F818A221C9EE400003CF1EC /* peg.wav */,
@@ -290,6 +293,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F4110531CCCF89000E3E238 /* explosion.wav in Resources */,
 				5F818A271C9EE400003CF1EC /* shot.wav in Resources */,
 				570DACBD1CB3ECAC004EA2B4 /* background.mp3 in Resources */,
 				5F6E170E1C9201D800B9C883 /* SparkParticle.sks in Resources */,

@@ -17,6 +17,14 @@ extension CGPoint {
 	}
 }
 
+extension CGVector {
+	var length: CGFloat {
+		get {
+			return sqrt(pow(dx, 2) + pow(dy, 2))
+		}
+	}
+}
+
 extension SKScene {
 	func absolutePosition(node: SKNode?) -> CGPoint? {
 		if node == nil { return nil }
@@ -102,19 +110,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var cannon: SKSpriteNode!
 	var cannonPosition = CGPointZero
 	var score: Int = 0
+	var followCam: SKCameraNode!
 	
-	// Camera variable - my way!
-	var followCam: SKCameraNode? {
-		get {
-			return self["//camera"].first as! SKCameraNode?
-		}
-	}
-	
-	var hasBall: Bool {
-		get {
-			return self["//ball"].first != nil
-		}
-	}
+	var ball: SKSpriteNode? = nil
+	var isReadyToShoot: Bool = true
 	
 	var touchLocation: CGPoint = CGPointZero
 	var backgroundMusic: SKAudioNode!
@@ -126,6 +125,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Connect nodes to our variables
 		cannon = self.childNodeWithName("//cannon") as! SKSpriteNode
 		if let pos = absolutePosition(cannon) { cannonPosition = pos }
+		
+		// Find the follow cam
+		self.followCam = self.childNodeWithName("camera") as! SKCameraNode
 		
 		// Process nodes in the scene
 		for nodeName in ["rotatingSquare", "orangePeg", "bluePeg", "leftWall", "rightWall", "ceiling", "ground", "bucket"] {
@@ -139,8 +141,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 						case "bluePeg":
 							node.physicsBody!.categoryBitMask = NodeCategory.Destructible | NodeCategory.Sparks | NodeCategory.Blue
 						case "leftWall", "rightWall", "ceiling", "ground":
-							if nodeName == "ground" { print("Found ground!") }
-							node.physicsBody!.categoryBitMask = NodeCategory.Boundary | NodeCategory.Sparks
+							node.physicsBody!.categoryBitMask = NodeCategory.Boundary
 						case "bucket":
 							node.physicsBody!.categoryBitMask = NodeCategory.Bucket
 							self.wobbleBucket(node, delta: 15)
@@ -173,7 +174,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			seaBody.allowsRotation = false
 			seaBody.dynamic = false
 			
-			seaBody.categoryBitMask = NodeCategory.Boundary | NodeCategory.Sea
+			seaBody.categoryBitMask = NodeCategory.Sea
 			seaBody.contactTestBitMask = NodeCategory.None
 			seaBody.collisionBitMask = NodeCategory.None
 			sea.physicsBody = seaBody
@@ -189,7 +190,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		})
 		
 		// Preload sounds used in the scene
-		let sounds = ["splash.mp3", "peg", "plum", "shot"]
+		let sounds = ["splash.mp3", "peg", "plum", "shot", "explosion"]
 		for sound in sounds {
 			let fileName: String
 			let fileExtension: String
@@ -234,6 +235,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Calculate the cannon angle and update it
 		let newAngle = atan2((touchLocation.x - cannonPosition.x), (touchLocation.y - cannonPosition.y))
 		cannon.zRotation = -newAngle + CGFloat(M_PI/2)
+		
+		// Unset ball if it's been removed from the scene
+		if self.ball != nil && !self.ball!.inParentHierarchy(self) {
+			ballWillBeRemoved()
+			self.ball = nil
+		}
+		
+		// See if the ball is moving and destroy it if not
+		if let ball = self.ball {
+			ballUpdate(ball)
+		}
 	}
 	
 	var backgroundNodeColor: UIColor? = nil
@@ -253,13 +265,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			other = contact.bodyA
 		}
 		
-		print("Contact of \(ball.node?.name) with \(other.node?.name)")
+		// print("Contact of \(ball.node?.name) with \(other.node?.name)")
 		
 		let otherMask = other.categoryBitMask
 		
 		if otherMask & NodeCategory.Boundary != 0 {
-			followNode(self)
-			ball.node?.removeFromParent()
+			
 		}
 		
 		if otherMask & NodeCategory.Destructible != 0 {
@@ -268,12 +279,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		if otherMask & NodeCategory.Sea != 0 {
-			emitSplash(contact.contactPoint)
+			ballDisappearanceInfo = BallDestructionInfo(position: contact.contactPoint, destiny: .Drowning)
+			ball.node?.removeFromParent()
 		}
 		
 	
 		if otherMask & NodeCategory.Bucket != 0 {
-			followNode(self)
 			bucketHit(ball.node)
 		}
 		
@@ -287,6 +298,91 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			emitSparks(contact.contactPoint, color: color)
 		}
+	}
+	
+	var recentBallVelocities: [CGFloat] = []
+	
+	func ballUpdate(ball: SKSpriteNode) {
+		let minSpeed: CGFloat = 300.0				// In pixels / second
+		let measureInterval: Float = 1.5		// Seconds (approximate at 60 fps)
+		let significantVelocities = Int(floor(measureInterval * 60))
+		
+		if let ballBody = ball.physicsBody {
+			// Add the ball position to the list
+			recentBallVelocities.append(ballBody.velocity.length)
+			
+			// Calculate average speed over the last measureInterval
+			var sum: CGFloat = 0
+			let start = max(0, recentBallVelocities.count -  significantVelocities)
+			let end = recentBallVelocities.count
+			let total = end - start
+			for i in start ..< end {
+				sum += recentBallVelocities[i]
+			}
+			
+			let averageSpeed = sum / CGFloat(total)
+			// print ("count: \(recentBallVelocities.count), start: \(start), end: \(end) avg: \(averageSpeed)")
+			
+			// TODO: Set camera zoom depending on speed
+			
+			if (!followCam.hasActions()) {
+				// Zoom in / out only when not currently zooming
+				let zoom = (min: Float(0.5), max: Float(2.0))
+				let speed = (min: Float(400), max: Float(3000))
+				let velocity = min(speed.max, max(speed.min, Float(averageSpeed)))
+				
+				// Calculate the zoom value
+				let factor = (zoom.min - zoom.max) / (speed.min - speed.max)
+				let scale = CGFloat(factor * (velocity - speed.min) + zoom.min)
+				
+				followCam.setScale(scale)
+			}
+			
+			if ballBody.resting || (recentBallVelocities.count >= significantVelocities && averageSpeed < minSpeed) {
+				ballDisappearanceInfo = BallDestructionInfo(position: ball.position, destiny: .Explosion)
+				ball.removeFromParent()
+			}
+		}
+	}
+	
+	
+	// The following two have information about what happened to the ball.
+	enum BallFinalDestiny {
+		case Drowning
+		case Explosion
+		case BucketLanding
+	}
+	
+	struct BallDestructionInfo {
+		var position: CGPoint = CGPointZero
+		var destiny: BallFinalDestiny
+	}
+	
+	var ballDisappearanceInfo: BallDestructionInfo? = nil
+	
+	// Executed before the ball is removed from the scene.
+	func ballWillBeRemoved() {
+		// Reset camera back to cannon
+		followNode(self)
+		recentBallVelocities.removeAll()
+		
+		if ballDisappearanceInfo == nil { return }
+		
+		let position = ballDisappearanceInfo!.position
+		let destiny = ballDisappearanceInfo!.destiny
+		
+		// Emit sparks and / or sounds depending on destiny
+		switch destiny {
+		case .Drowning:
+			emitSplash(position)
+		case .Explosion:
+			self.runAction(SKAction.playSoundFileNamed("explosion", waitForCompletion: false))
+			emitSparks(position)
+		default: break
+		}
+		
+		// Remove disappearance info since it's been dealt with
+		ballDisappearanceInfo = nil
 	}
 	
 	func moveCamera(to: CGPoint, zoom: CGFloat = 1, duration: NSTimeInterval = 0.5) {
@@ -304,40 +400,48 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func followNode(node: SKNode, zoom: CGFloat = 1) {
-		// TODO: make camera movements more smooth (with action smoothing function?)
-		if let camera = self.followCam {
-			if node.isEqualToNode(self) {
-				// Reset the camera position
-				let relativePosition = absolutePosition(camera)
-				camera.removeFromParent()
-				
-				if relativePosition != nil {
-					camera.position = relativePosition!
-				}
-				
-				self.addChild(camera)
-				moveCamera(CGPoint(x: -1555, y: 540), zoom: 1, duration: 0.5)
+		if node.isEqualToNode(self) {
+			// Reset the camera position
+			let relativePosition: CGPoint?
+			if let deathInfo = ballDisappearanceInfo {
+				print("Using ball destruction position.")
+				relativePosition = deathInfo.position
 			}
 			else {
-				// Follow the node
-				if let handle = node.childNodeWithName("cameraHandle") {
-					let oldRelativePosition = absolutePosition(camera)
-					camera.removeFromParent()
-					
-					let nodePosition = absolutePosition(handle)
-					if oldRelativePosition != nil && nodePosition != nil {
-						camera.position = CGPoint(
-							x: oldRelativePosition!.x - nodePosition!.x,
-							y: oldRelativePosition!.y - nodePosition!.y
-						)
-					}
-					
-					handle.addChild(camera)
-					moveCamera(CGPoint(x: 0, y: 0), zoom: 0.75, duration: 0.5)
+				print("Using cam position.")
+				relativePosition = absolutePosition(followCam)
+			}
+			followCam.removeFromParent()
+			
+			if relativePosition != nil {
+				followCam.position = relativePosition!
+			}
+			else {
+				print("Position not found.")
+			}
+			
+			self.addChild(followCam)
+			moveCamera(CGPoint(x: -1555, y: 540), zoom: 1, duration: 0.5)
+			self.isReadyToShoot = true
+		}
+		else {
+			// Follow the node
+			if let handle = node.childNodeWithName("cameraHandle") {
+				let oldRelativePosition = absolutePosition(followCam)
+				followCam.removeFromParent()
+				
+				let nodePosition = absolutePosition(handle)
+				if oldRelativePosition != nil && nodePosition != nil {
+					followCam.position = CGPoint(
+						x: oldRelativePosition!.x - nodePosition!.x,
+						y: oldRelativePosition!.y - nodePosition!.y
+					)
 				}
+				
+				handle.addChild(followCam)
+				moveCamera(CGPoint(x: 0, y: 0), zoom: zoom, duration: 0.5)
 			}
 		}
-		
 	}
 	
 	func emitSparks(position: CGPoint, color: UIColor? = nil) {
@@ -361,14 +465,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	func shootBall(fromPosition fromPosition: CGPoint, targetPosition: CGPoint, radius: CGFloat = 30) {
 		
-		if self.hasBall { return }	// Only allow one ball at a time
+		if !self.isReadyToShoot { return }	// Only allow one ball at a time
 		
 		// Make a new node
-		let ball = SKSpriteNode(imageNamed: "ball1")
-		ball.name = "ball"
-		ball.size.width = 2 * radius
-		ball.size.height = 2 * radius
-		ball.position = fromPosition
+		ball = SKSpriteNode(imageNamed: "ball1")
+		ball?.name = "ball"
+		ball?.size.width = 2 * radius
+		ball?.size.height = 2 * radius
+		ball?.position = fromPosition
 		
 		// Animate the node
 		var ballTextures: [SKTexture] = []
@@ -377,24 +481,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		let ballAnimation = SKAction.animateWithTextures(ballTextures, timePerFrame: 0.1)
-		ball.runAction(SKAction.repeatActionForever(ballAnimation))
+		ball?.runAction(SKAction.repeatActionForever(ballAnimation))
 		
 		// Configure physics body
-		ball.physicsBody = SKPhysicsBody(circleOfRadius: radius)
-		ball.physicsBody?.linearDamping = 0.1
-		ball.physicsBody?.angularDamping = 0.1
-		ball.physicsBody?.mass = 0.12
-		ball.physicsBody?.restitution = 0.3
+		ball?.physicsBody = SKPhysicsBody(circleOfRadius: radius)
+		ball?.physicsBody?.linearDamping = 0.1
+		ball?.physicsBody?.angularDamping = 0.5
+		ball?.physicsBody?.mass = 0.2
+		ball?.physicsBody?.restitution = 0.4
 		
 		// Categorise the ball
-		ball.physicsBody?.categoryBitMask = NodeCategory.Ball
-		ball.physicsBody?.contactTestBitMask = NodeCategory.All
-		ball.physicsBody?.collisionBitMask = NodeCategory.All - NodeCategory.FlyThrough
+		ball?.physicsBody?.categoryBitMask = NodeCategory.Ball
+		ball?.physicsBody?.contactTestBitMask = NodeCategory.All
+		ball?.physicsBody?.collisionBitMask = NodeCategory.All - NodeCategory.FlyThrough
 		
 		// Add smoke
 		if let smoke = SKEmitterNode(fileNamed: "Smoke") {
 			smoke.targetNode = self
-			ball.addChild(smoke)
+			ball?.addChild(smoke)
 		}
 		
 		// Add camera handle
@@ -411,17 +515,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		handle.physicsBody?.categoryBitMask = NodeCategory.None
 		handle.physicsBody?.collisionBitMask = NodeCategory.None
 		
-		ball.addChild(handle)
+		ball?.addChild(handle)
 		
 		
 		// Shoot it out!
-		self.addChild(ball)
-		ball.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition, maxLength: 250))
+		self.isReadyToShoot = false
+		self.addChild(ball!)
+		ball?.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition, maxLength: 250))
 		cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
 		
 		// Make the camera follow the ball
-		followNode(ball, zoom: 0.75)
-		
+		followNode(ball!, zoom: 1.5)
 	}
 	
 	func ballVector(ballPosition ballPosition: CGPoint, touchPosition: CGPoint, maxLength:CGFloat = 150) -> CGVector {
@@ -463,6 +567,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		self.runAction(SKAction.playSoundFileNamed("plum.wav", waitForCompletion: false))
+		ballDisappearanceInfo = BallDestructionInfo(position: absolutePosition(ball!)!, destiny: .BucketLanding)
 		ball?.removeFromParent()
 		
 		// Add some actions and animations
