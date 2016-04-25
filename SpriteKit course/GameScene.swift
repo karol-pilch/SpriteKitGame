@@ -323,8 +323,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			let averageSpeed = sum / CGFloat(total)
 			// print ("count: \(recentBallVelocities.count), start: \(start), end: \(end) avg: \(averageSpeed)")
 			
-			// TODO: Set camera zoom depending on speed
-			
 			if (!followCam.hasActions()) {
 				// Zoom in / out only when not currently zooming
 				let zoom = (min: Float(0.5), max: Float(2.0))
@@ -386,17 +384,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	}
 	
 	func moveCamera(to: CGPoint, zoom: CGFloat = 1, duration: NSTimeInterval = 0.5) {
-		if let camera = followCam {
-			let move = SKAction.moveTo(to, duration: duration)
-			move.timingMode = SKActionTimingMode.EaseInEaseOut
-			
-			let zoom = SKAction.scaleTo(zoom, duration: duration)
-			zoom.timingMode = SKActionTimingMode.EaseInEaseOut
-			
-			camera.runAction(move)
-			camera.runAction(zoom)
-
-		}
+		followCam.runAction(cameraMoveAction(destination: to, zoom: zoom, duration: duration))
+	}
+	
+	func cameraMoveAction(destination to: CGPoint, zoom: CGFloat = 1, duration: NSTimeInterval = 0.5) -> SKAction {
+		let move = SKAction.moveTo(to, duration: duration)
+		move.timingMode = SKActionTimingMode.EaseInEaseOut
+		
+		let zoom = SKAction.scaleTo(zoom, duration: duration)
+		zoom.timingMode = SKActionTimingMode.EaseInEaseOut
+		
+		return SKAction.group([move, zoom])
 	}
 	
 	func followNode(node: SKNode, zoom: CGFloat = 1) {
@@ -404,11 +402,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			// Reset the camera position
 			let relativePosition: CGPoint?
 			if let deathInfo = ballDisappearanceInfo {
-				print("Using ball destruction position.")
 				relativePosition = deathInfo.position
 			}
 			else {
-				print("Using cam position.")
 				relativePosition = absolutePosition(followCam)
 			}
 			followCam.removeFromParent()
@@ -416,13 +412,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if relativePosition != nil {
 				followCam.position = relativePosition!
 			}
-			else {
-				print("Position not found.")
-			}
 			
 			self.addChild(followCam)
-			moveCamera(CGPoint(x: -1555, y: 540), zoom: 1, duration: 0.5)
-			self.isReadyToShoot = true
+			
+			let cameraSequence = SKAction.sequence([
+				cameraMoveAction(destination: CGPoint(x: 0, y: 2000), zoom: 4, duration: 1),
+				SKAction.waitForDuration(1.2),
+				cameraMoveAction(destination: CGPoint(x: -1555, y: 540))
+			])
+			
+			followCam.runAction(cameraSequence, completion: {
+				self.isReadyToShoot = true
+			})
 		}
 		else {
 			// Follow the node
@@ -488,7 +489,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		ball?.physicsBody?.linearDamping = 0.1
 		ball?.physicsBody?.angularDamping = 0.5
 		ball?.physicsBody?.mass = 0.2
-		ball?.physicsBody?.restitution = 0.4
+		ball?.physicsBody?.restitution = 0.5
 		
 		// Categorise the ball
 		ball?.physicsBody?.categoryBitMask = NodeCategory.Ball
@@ -521,7 +522,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		// Shoot it out!
 		self.isReadyToShoot = false
 		self.addChild(ball!)
-		ball?.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition, maxLength: 250))
+		ball?.physicsBody?.applyImpulse(ballVector(ballPosition: fromPosition, touchPosition: targetPosition, maxLength: 150))
 		cannon.runAction(SKAction.playSoundFileNamed("shot.wav", waitForCompletion: false))
 		
 		// Make the camera follow the ball
